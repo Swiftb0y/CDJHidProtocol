@@ -24,4 +24,4 @@ jobs:
       uses: kameshsampath/antora-site-action@v0.2.2
       with:
         # The Antora playbook file
-        antora_playbook: local.yml
+        antora_playbook: docs/local.yml
