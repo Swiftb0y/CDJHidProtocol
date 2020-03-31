@@ -1,3 +1,45 @@
 = CDJ HID Protocol
+Nikolaus Einhauser
+:icons: font
+:toc:
+:experimental:
+
+== Background
+
+Historically, DJ controllers (meaning hardware whose purpose is to communicate with digital DJ Software) have been using MIDI[https://en.wikipedia.org/wiki/MIDI] over USB. With increasing complexity, the protocol became a bottleneck for certain applications, causing Hardware-manufacturers to start transmitting data via HID[https://en.wikipedia.org/wiki/Human_interface_device]. This allows for comparatively simple mechanisms such as simply serializing the status of controls on the controller into a buffer of fixed format but also creating complex proprietary binary protocols involving data fragmented over multiple HID packets, handshakes, variable-length data, etc.
+
+The PioneerDJ CDJ-2000NXS2 has many different ways to communicate with other devices such as other CDJs or Mixers. One if these methods is using a custom Network Protocol called ProDJLink whose https://djl-analysis.deepsymmetry.org/djl-analysis/startup.html[reverse engineering efforts] have inspired this project as well.
+
+== Protocol primitives
+
+Every Packet being sent and received to and from the CDJs have a common structure:
+
+[bytefield]
+----
+include::example$common_header.edn[]
+
+(draw-packet-header "type")
+(draw-box nil [{:span 14} :box-above])
+(draw-box (text "Packet rest according to type (padded with " :plain [:hex "00"] ")") [ :box-middle {:span 16}])
+(draw-box nil [{:span 16} :box-below])
+
+----
+This format limits the maximum amount of data transmitted to 36 Bytes which is not sufficient for
+transmitting larger strings or other binary data such as images. For these purposes, the protocol uses an extended header
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+
+(draw-packet-header "type")
+(draw-box nil [{:span 10} :box-above])
+(draw-box (text "Packet rest according to type (padded with " :plain [:hex "00"] ")") [ :box-middle {:span 16}])
+(draw-box nil [{:span 16} :box-below])
+----
+
+`L` denotes the number of packets the data following
+takes up while `I` indicates the index of the packet fragment in the current stream.
 
 
+.Currently known values for `type`
+* `0x11` - `0x15`: Used in Handshake procedure of host and CDJ
