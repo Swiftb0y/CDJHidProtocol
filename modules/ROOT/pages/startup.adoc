@@ -36,7 +36,7 @@ Packets with an extended header are able to transmit stem:[(\text{0x30} - 6)*2^8
 ----
 include::example$common_fragmented_header.edn[]
 
-(draw-packet-header "type")
+(draw-packet-header "type" "I" "L")
 (draw-box nil [{:span 10} :box-above])
 (draw-box (text "Packet rest according to type (padded with " :plain [:hex "00"] ")") [ :box-middle {:span 16}])
 (draw-box nil [{:span 16} :box-below])
