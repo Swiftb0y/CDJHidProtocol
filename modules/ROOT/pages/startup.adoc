@@ -42,4 +42,6 @@ takes up while `I` indicates the index of the packet fragment in the current str
 
 
 .Currently known values for `type`
-* `0x11` - `0x15`: Used in Handshake procedure of host and CDJ
+* `0xf0`: Used in Handshake procedure of host and CDJ
+* `0x25`: Set on-screen BPM
+
