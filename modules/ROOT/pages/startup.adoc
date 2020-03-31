@@ -45,3 +45,16 @@ takes up while `I` indicates the index of the packet fragment in the current str
 * `0xf0`: Used in Handshake procedure of host and CDJ
 * `0x25`: Set on-screen BPM
 
+
+[bytefield]
+----
+include::example$tlv_struct.edn[]
+
+(tlv-struct "T" (fn [] (draw-gap) (draw-bottom)))
+
+----
+
+These TLV structures can occur nested (for example in the handshakes TODO hyperlink)
+It seems `T` only indirectly describes the actual type of data in the buffer. Instead `T`
+indicates __what the data is actually used for__, which in turn describes the actual
+type of the data.
