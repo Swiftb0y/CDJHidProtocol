@@ -12,7 +12,9 @@ The PioneerDJ CDJ-2000NXS2 has many different ways to communicate with other dev
 
 == Protocol primitives
 
-Every Packet being sent and received to and from the CDJs have a common structure:
+=== Simple header
+
+Every Packet being sent and received to and from the CDJs shares this common header:
 
 [bytefield]
 ----
@@ -27,6 +29,9 @@ include::example$common_header.edn[]
 This format limits the maximum amount of data transmitted to 36 Bytes which is not sufficient for
 transmitting larger strings or other binary data such as images. For these purposes, the protocol uses an extended header
 
+=== Extended Header
+
+Packets with an extended header are able to transmit stem:[(\text{0x30} - 6)*2^8 = 10752] Bytes of data.
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
@@ -45,7 +50,9 @@ takes up while `I` indicates the index of the packet fragment in the current str
 * `0xf0`: Used in Handshake procedure of host and CDJ
 * `0x25`: Set on-screen BPM
 
+=== TLV Structure
 
+Some parts of the Protocol utilize a TLV structure:
 [bytefield]
 ----
 include::example$tlv_struct.edn[]
