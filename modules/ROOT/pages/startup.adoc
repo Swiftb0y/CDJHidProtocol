@@ -26,7 +26,7 @@ include::example$common_header.edn[]
 (draw-box nil [{:span 16} :box-below])
 
 ----
-This format limits the maximum amount of data transmitted to 36 Bytes which is not sufficient for
+This format limits the maximum amount of data transmitted to 46 Bytes which is not sufficient for
 transmitting larger strings or other binary data such as images. For these purposes, the protocol uses an extended header
 
 === Extended Header
