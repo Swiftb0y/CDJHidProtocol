@@ -13,9 +13,9 @@
   startup packet with the specified `kind` byte."
   [kind]
   (draw-column-headers)
-  (draw-box 00)
-  (draw-box kind [:bold :math :bg-green])
-  (draw-box "I" [:math :bg-blue])
-  (draw-box 00)
-  (draw-box "L" [:math :bg-blue])
-  (draw-box 00))
+  (draw-box 00 :box-first)
+  (draw-box kind [:bold :math :bg-green :box-last])
+  (draw-box "I" [:math :bg-blue :box-first])
+  (draw-box 00 :box-related)
+  (draw-box "L" [:math :bg-blue :box-related])
+  (draw-box 00 :box-last))

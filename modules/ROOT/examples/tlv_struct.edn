@@ -3,6 +3,6 @@
 
  (defn tlv-struct
    [type length value]
-   (draw-box type :bg-red)
-   (draw-box length)
+   (draw-box type [:bg-red :box-first])
+   (draw-box length :box-last)
    (value))
