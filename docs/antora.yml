@@ -1,7 +1,0 @@
-name: hid-analysis
-title: CDJ HID Packet Analysis
-version: 'master'
-prerelease: false
-start_page: ROOT:startup.adoc
-nav:
-- modules/ROOT/nav.adoc
