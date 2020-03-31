@@ -1,0 +1,21 @@
+
+;; Functions to draw common features of startup (announcement) packets.
+
+;; Some nice default background colors, used to distinguish header sections.
+(defattrs :bg-green {:fill "#a0ffa0"})
+
+(defattrs :bg-blue {:fill "#80a0ff"})
+
+(defattrs :box-middle {:borders #{:left :right}})
+
+(defn draw-packet-header
+  "Generates the byte labels and first two rows of a standard DJ Link
+  startup packet with the specified `kind` byte."
+  [kind]
+  (draw-column-headers)
+  (draw-box 00)
+  (draw-box kind [:bold :math :bg-green])
+  (draw-box "I" [:math :bg-blue])
+  (draw-box 00)
+  (draw-box "L" [:math :bg-blue])
+  (draw-box 00))

@@ -1,0 +1,8 @@
+
+(defattrs :bg-red {:fill "#ffa080"})
+
+ (defn tlv-struct
+   [type value]
+   (draw-box type :bg-red)
+   (draw-box "L" :math)
+   value)
