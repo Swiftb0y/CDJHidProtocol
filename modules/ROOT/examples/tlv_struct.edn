@@ -2,7 +2,7 @@
 (defattrs :bg-red {:fill "#ffa080"})
 
  (defn tlv-struct
-   [type value]
+   [type length value]
    (draw-box type :bg-red)
-   (draw-box "L" :math)
+   (draw-box length)
    (value))
