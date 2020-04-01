@@ -1,0 +1,60 @@
+= Control Packets
+
+== Controlling LEDs on the CDJ
+
+Controlling LEDs on the CDJ can by accomplished by sending
+packets with a <<startup.adoc#simple-header, simple header>>
+
+
+[bytefield]
+----
+include::example$common_header.edn[]
+include::partial$custom_macros.edn[]
+
+
+(draw-packet-header 0x21)
+
+(draw-box nil [{:span 14} :box-above])
+(draw-box "Controller control data" [ :box-middle {:span 16}])
+(draw-box nil [:box-middle {:span 16}])
+(draw-box nil [{:span 16} :box-below])
+
+----
+
+This type of packet seems to pack data very compact and encodes data 
+even into single bits
+
+[options="header"]
+|===
+| Offset | Bitmask | Control 
+
+| `0x03` | TODO: move up from later sections of page (0b1000_0000)| Play LED
+| `0x04` | TODO: move up from later sections of page (0b1000_0000)|  Cue LED
+| `0x0d` | TODO: move up from later sections of page (0b1111_1111)| needle position between the two currently adjacent beats. `0x00` being at the previous beat and `0xff` being at the next beat.
+| `0x0e` | TODO: move up from later sections of page (0b1111_1111)| number of the previous beat in the current bar (1-based)
+
+|===
+
+
+.`0b1000_0000`
+[bytefield]
+----
+include::partial$bitfield.edn[]
+include::partial$custom_macros.edn[]
+
+(create-bitfield-env)
+(draw-box (bit-text 1))
+(draw-padding boxes-per-row (bit-text 0))
+
+----
+
+.`0b1111_1111`
+[bytefield]
+----
+include::partial$bitfield.edn[]
+include::partial$custom_macros.edn[]
+
+(create-bitfield-env)
+(draw-related-boxes (repeat 8 (bit-text 1)))
+
+----
