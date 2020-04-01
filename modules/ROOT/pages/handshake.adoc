@@ -1,0 +1,170 @@
+= HID Handshake
+Nikolaus Einhauser
+:icons: font
+:toc:
+:experimental:
+
+== Handshake procedure
+
+Before the Host and the Controller can exchange any meaningful data,
+they have to carry out a handshake. This handshake is initiated via the
+CDJ by using the Link menu: `[LINK] > CONTROL MODE (CDJ) > USB MIDI`.
+This will cause the CDJ to start sending USB-MIDI packets and the first
+Packet of the handshake procedure:
+
+NOTE: USB-Devices are by definition unable to send data to the host on their
+own. The host instead as to constantly pull for changes. So make sure the
+Software running on the host is doing that before connecting initiating the 
+connection on the CDJ.
+
+[bytefield]
+----
+include::example$tlv_struct.edn[]
+include::example$common_fragmented_header.edn[]
+
+include::partial$custom_macros.edn[]
+
+(draw-packet-header 0xf0 1 1)
+(tlv-struct 
+  (hex-text 0x11 2 :bold)
+  4 
+  #(draw-related-boxes [0x01 0x04 0x01 0x55]))
+
+(draw-padding 0x30)
+----
+
+The meaning of the values at offset `0x08` to `0x0b` is unknown.
+
+At this point the host has to respond with the following message:
+
+[bytefield]
+----
+include::example$tlv_struct.edn[]
+include::example$common_fragmented_header.edn[]
+
+include::partial$custom_macros.edn[]
+
+
+(draw-packet-header 0xf0 1 1)
+
+(tlv-struct 
+  (hex-text 0x12 2 :bold)
+  "L")
+(tlv-struct 1 (text "L" :math [:sub "M"])
+  #(draw-box "Manufacturer" {:span 4}))
+(tlv-struct 2 (text "L" :math [:sub "P"])
+  #(draw-box "Product" {:span 4}))
+(tlv-struct 3 18
+  #(draw-related-boxes [0x00 0x00 0x00 0x00 0x01 0x0a 0x01 0x09 0x00 0x00 0x00 0x00 0x07 0x04 0x0b 0x05]))
+
+(draw-padding 0x30)
+
+----
+
+The packet consists of an extended header and a TLV structure which
+contains another three TLV structures in sequence.
+Values seen so far for manufacturer are "PioneerDJ" and "NativeInstruments"
+as well as "CDJ2000NXS2", "rekordbox" and "TraktorPro2" for the product.
+
+This is followed up by response from the CDJ:
+
+[bytefield]
+----
+include::example$tlv_struct.edn[]
+include::example$common_fragmented_header.edn[]
+
+include::partial$custom_macros.edn[]
+
+
+(draw-packet-header 0xf0 1 1)
+
+(tlv-struct 
+  (hex-text 0x13 2 :bold)
+  "L")
+(tlv-struct 1 (text "L" :math [:sub "M"])
+  #(draw-box "Manufacturer" {:span 4}))
+(tlv-struct 2 (text "L" :math [:sub "P"])
+  #(draw-box "Product" {:span 4}))
+(tlv-struct 4 0x0a
+  #(draw-related-boxes [0x01,0x08,0x0d,0x08,0x07,0x05,0x0af]))
+(tlv-struct 3 18
+  #(draw-related-boxes [0x03 0x0f 0x03 0x00 0x03 0x03 0x0d 0x0e]))
+
+(draw-padding 0x30)
+----
+
+Which is then again followed up by a packet from the host.
+
+[bytefield]
+----
+include::example$tlv_struct.edn[]
+include::example$common_fragmented_header.edn[]
+
+include::partial$custom_macros.edn[]
+
+
+(draw-packet-header 0xf0 1 2)
+
+(tlv-struct 
+  (hex-text 0x14 2 :bold)
+  "L")
+(tlv-struct 1 (text "L" :math [:sub "M"])
+  #(draw-box "Manufacturer" {:span 4}))
+(tlv-struct 2 (text "L" :math [:sub "P"])
+  #(draw-box "Product" {:span 4}))
+(tlv-struct 4 0x0a
+  #(draw-related-boxes [0x5 0x5 0x5 0x5 0x0 0x1 0x3 0xc]))
+(tlv-struct 5 0x16
+  #(draw-related-boxes [0x00 0x02 0x0f 0x00 0x0f 0x04 0x05 0x01 0x00 0x0e 0x0d 0x03 0x00 0x0a 0x02 0x0c]))
+
+(draw-padding 0x30)
+----
+
+On closer examination, we can see that this packet is transferring
+a buffer which is larger than the 42 possible bytes in a single packet 
+so it is followed up by a packet with rest of the data.
+
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+
+include::partial$custom_macros.edn[]
+
+(draw-packet-header 0xf0 2 2)
+
+(draw-related-boxes [0x01 0x00 0x04 0x02])
+
+(draw-padding 0x30)
+----
+
+The Handshake ends with an acknowledgment from the CDJ:
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::example$tlv_struct.edn[]
+
+include::partial$custom_macros.edn[]
+
+(draw-packet-header 0xf0 2 2)
+
+(tlv-struct (hex-text 0x15 2 :bold) 2)
+
+(draw-padding 0x30)
+----
+
+== TLV Types
+[options="header"]
+|=== 
+| TLV Type | Description | Direction 
+
+| `0x01`   | Contains the Name of the manufacturer.footnote:direction[Refers to the Software or Hardware depending on the message direction.]footnote:asciistring[String is serialized in ASCII] | Bidirectional
+| `0x02`   | Contains the Name of the Product.footnote:direction[]footnote:asciistring[] | Bidirectional
+| `0x03`, `0x04`, `0x05` | Format currently unknown, but it is expected that just replaying the values in the diagram should work.  | Bidirectional
+| `0x11`   | Handshake initialization | CDJ->Host only
+| `0x12`   | Handshake initialization response | Host->CDJ only
+| `0x13`   | CDJ Handshake data packet | CDJ->Host only
+| `0x14`   | CDJ Handshake data packet response | Host->CDJ only
+| `0x15`   | CDJ Handshake completion  | CDJ->Host only
+|=== 

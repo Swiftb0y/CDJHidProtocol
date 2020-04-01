@@ -1,1 +1,2 @@
 * xref:startup.adoc[CDJ HID Protocol]
+* xref:handshake.adoc[CDJ Handshake]
