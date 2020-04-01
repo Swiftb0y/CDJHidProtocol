@@ -6,7 +6,7 @@ Nikolaus Einhauser
 
 == Background
 
-Historically, DJ controllers (meaning hardware whose purpose is to communicate with digital DJ Software) have been using MIDI[https://en.wikipedia.org/wiki/MIDI] over USB. With increasing complexity, the protocol became a bottleneck for certain applications, causing Hardware-manufacturers to start transmitting data via HID[https://en.wikipedia.org/wiki/Human_interface_device]. This allows for comparatively simple mechanisms such as simply serializing the status of controls on the controller into a buffer of fixed format but also creating complex proprietary binary protocols involving data fragmented over multiple HID packets, handshakes, variable-length data, etc.
+Historically, DJ controllers (meaning hardware whose purpose is to communicate with digital DJ Software) have been using https://en.wikipedia.org/wiki/MIDI[MIDI] over USB. With increasing complexity, the protocol became a bottleneck for certain applications, causing Hardware-manufacturers to start transmitting data via https://en.wikipedia.org/wiki/Human_interface_device[HID]. This allows for comparatively simple mechanisms such as simply serializing the status of controls on the controller into a buffer of fixed format but also creating complex proprietary binary protocols involving data fragmented over multiple HID packets, handshakes, variable-length data, etc.
 
 The PioneerDJ CDJ-2000NXS2 has many different ways to communicate with other devices such as other CDJs or Mixers. One if these methods is using a custom Network Protocol called ProDJLink whose https://djl-analysis.deepsymmetry.org/djl-analysis/startup.html[reverse engineering efforts] have inspired this project as well.
 
