@@ -6,4 +6,4 @@
   ([type length value]
    (draw-box type [:bg-red :box-first])
    (draw-box length :box-last)
-   (when (some? value) (value))))
+   (when value (value))))
