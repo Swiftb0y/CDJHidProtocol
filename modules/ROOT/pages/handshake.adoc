@@ -13,7 +13,7 @@ This will cause the CDJ to start sending USB-MIDI packets and the first
 Packet of the handshake procedure:
 
 NOTE: USB-Devices are by definition unable to send data to the host on their
-own. The host instead as to constantly pull for changes. So make sure the
+own. The host instead has to constantly pull for changes. So make sure the
 Software running on the host is doing that before connecting initiating the 
 connection on the CDJ.
 
