@@ -1,0 +1,70 @@
+= Library interaction
+Nikolaus Einhauser
+:icons: font
+:toc:
+:experimental:
+
+It is possible to send library data to the CDJ by directly sending strings to
+the CDJ which are then displayed at their appropriate places. This is done by
+using a <<startup.adoc#extended-header,extended header packet>> (to allow the
+data to be fragmented over multiple packets). It follows a comparatively 
+simple format which allows to send strings to the nine library rows:
+
+image::CDJ-library-view.svg[CDJ library diagram, 700]
+
+
+Each zone can be controlled using a row-struct:
+
+[bytefield]
+----
+include::example$row_struct.edn[]
+
+(row-struct "R" "I" #((draw-gap "UTF-16LE String")  (draw-bottom)))
+
+----
+`R` indicates the row number while `I` indicates an the ID of the optional Icon
+(which the CDJ will prefix before the string)
+as well as whether the row in question is currently selected.
+The String is encoded as UTF-16LE and terminate with a null-byte (or rather two
+`0x00` bytes since the string is encoded as UTF-16). The information in the `I` 
+byte stores whether the row in question is currently selected as well as the icon
+ID in the following bitfield:
+
+[bytefield]
+----
+include::partial$bitfield.edn[]
+(create-bitfield-env)
+
+(draw-box "S")
+(draw-box "icon ID" {:span 7})
+----
+
+If the "S" bit is set, then that row is currently selected.
+
+.Known Icon IDs
+[options="header"]
+|===
+|   ID  | Icon | Description
+
+| `0x00` |  --  | Don't prefix any Icon
+| `0x02` | image:cdj_icons/close_folder.jpg[closed folder] image:cdj_icons/open_folder.jpg[closed folder] | Folder
+| `0x04` | image:cdj_icons/track_file_name.jpg[track / filename] | Musical 8th Note (used to indicate entry is a track)
+| `0x07` | image:cdj_icons/playlist.jpg[playlist icon] | Document / Playlist / Fallback
+|===
+
+
+These row-structs are then collected in a buffer and sent out using an
+<<startup.adoc#extended-header,extended header packet>> (so you might have
+to break up the buffer)
+
+[bytefield]
+----
+
+include::example$common_fragmented_header.edn[]
+include::example$row_struct.edn[]
+
+(draw-packet-header 0x2a "I" "L")
+
+(doseq [n (range 9)]  
+  (row-struct n "Icon" #(draw-box "String" {:span 2})))
+----
