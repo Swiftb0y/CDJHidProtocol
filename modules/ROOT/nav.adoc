@@ -1,3 +1,4 @@
 * xref:startup.adoc[CDJ HID Protocol]
 * xref:handshake.adoc[CDJ Handshake]
 * xref:control.adoc[CDJ Control]
+* xref:library_interaction.adoc[CDJ Library Interaction]
