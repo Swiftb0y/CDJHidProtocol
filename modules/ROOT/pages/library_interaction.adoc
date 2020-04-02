@@ -59,6 +59,7 @@ to break up the buffer)
 
 [bytefield]
 ----
+include::partial$custom_macros.edn[]
 
 include::example$common_fragmented_header.edn[]
 include::example$row_struct.edn[]
@@ -67,4 +68,6 @@ include::example$row_struct.edn[]
 
 (doseq [n (range 9)]  
   (row-struct n "Icon" #(draw-box "String" {:span 2})))
+
+(draw-padding 0x40)
 ----
