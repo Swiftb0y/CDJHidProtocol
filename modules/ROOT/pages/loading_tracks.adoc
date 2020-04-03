@@ -1,0 +1,98 @@
+= Loading Tracks
+Nikolaus Einhauser
+:icons: font
+:toc:
+:experimental:
+
+When loading a track, the host has to send a sequence of complex packets
+to the CDJ. These contain not only the usual track metadata such as artist,
+track title, etc. but also DJ related metadata such as Hotcues (including their 
+color), the tracks BPM, its waveform and more. This page will describe how
+exactly this is achieved via the CDJs HID protocol:
+
+.String encoding
+****
+Unless specified otherwise, all strings are encoded
+in `UTF-16LE` and terminated with a null byte (or rather two `00` bytes since the string is encoded in UTF-16)
+****
+
+
+== Track title
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::partial$fragmented_string_packet.edn[]
+
+(draw-string-packet 0x22 "Track title")
+----
+
+
+== Artist
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::partial$fragmented_string_packet.edn[]
+
+(draw-string-packet 0x23 "Artist")
+----
+
+== Album
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::partial$fragmented_string_packet.edn[]
+
+(draw-string-packet 0x24 "Album")
+----
+
+
+== BPM
+
+The BPM is serialized as a string as given in centi-BPM (so multiply the
+BPM value by 100 before serializing)
+
+CAUTION: This only sets the average bpm metadata shown in the track details
+(when clicking the `INFO` button of the CDJ over the top of the screen).
+This has nothing to do with the the BPM displayed in the waveform view. 
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::partial$fragmented_string_packet.edn[]
+
+(draw-string-packet 0x25 "BPM")
+----
+
+
+== Genre
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::partial$fragmented_string_packet.edn[]
+
+(draw-string-packet 0x42 "Genre")
+----
+
+== Composer
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::partial$fragmented_string_packet.edn[]
+
+(draw-string-packet 0x43 "Composer")
+----
+
+== Lyricist
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+include::partial$fragmented_string_packet.edn[]
+
+(draw-string-packet 0x44 "Lyricist")
+----

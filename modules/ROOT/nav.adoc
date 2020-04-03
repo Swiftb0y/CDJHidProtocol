@@ -2,3 +2,4 @@
 * xref:handshake.adoc[CDJ Handshake]
 * xref:control.adoc[CDJ Control]
 * xref:library_interaction.adoc[CDJ Library Interaction]
+* xref:loading_tracks.adoc[Loading tracks on the CDJ]
