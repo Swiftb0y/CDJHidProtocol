@@ -67,3 +67,14 @@ These TLV structures can occur nested (for example in the handshakes TODO hyperl
 It seems `T` only indirectly describes the actual type of data in the buffer. Instead `T`
 indicates __what the data is actually used for__, which in turn describes the actual
 type of the data.
+
+== Thanks
+
+An enormous thanks to James Elliot (https://github.com/brunchboy[@brunchboy]) from
+https://deepsymmetry.org/[Deep Symmetry] for not only creating
+https://github.com/Deep-Symmetry/bytefield-svg[bytefield-svg] which allowed 
+me to create these awesome bytefield diagrams but also for all of 
+https://djl-analysis.deepsymmetry.org/[his previous research] into the ProDJLink
+Protocol as well as helping me in the setup of this wiki and using bytefield-svg.
+Also thanks to mailto:ard@kwaak.net/[Ard van Breemen] for helping out with his 
+in-depth knowledge of the USB protocol.
