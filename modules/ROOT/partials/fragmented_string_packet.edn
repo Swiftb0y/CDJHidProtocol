@@ -1,0 +1,8 @@
+;; requires a previous include::example$common_fragmented_header.edn[]
+
+(defn draw-string-packet
+  "prints a fragmented string packet"
+  [type string]
+  ((draw-packet-header type "I" "L")
+   (draw-gap string)
+   (draw-bottom)))
