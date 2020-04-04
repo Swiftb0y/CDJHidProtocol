@@ -55,7 +55,8 @@ include::partial$custom_macros.edn[]
 (tlv-struct 2 (text "L" :math [:sub "P"])
   #(draw-box "Product" {:span 4}))
 (tlv-struct 3 18
-  #(draw-related-boxes [0x00 0x00 0x00 0x00 0x01 0x0a 0x01 0x09 0x00 0x00 0x00 0x00 0x07 0x04 0x0b 0x05]))
+  #((draw-box "Yet to decipher data" [{:span 10} :box-above])
+    (draw-box "" [{:span 6} :box-below])))
 
 (draw-padding 0x40)
 
@@ -86,9 +87,9 @@ include::partial$custom_macros.edn[]
 (tlv-struct 2 (text "L" :math [:sub "P"])
   #(draw-box "Product" {:span 4}))
 (tlv-struct 4 0x0a
-  #(draw-related-boxes [0x01,0x08,0x0d,0x08,0x07,0x05,0x0af]))
-(tlv-struct 3 18
-  #(draw-related-boxes [0x03 0x0f 0x03 0x00 0x03 0x03 0x0d 0x0e]))
+  #(draw-box "Yet to decipher data" {:span 8}))
+(tlv-struct 3 0xd
+  #(draw-box "Yet to decipher data" {:span 0xb}))
 
 (draw-padding 0x40)
 ----
@@ -113,9 +114,10 @@ include::partial$custom_macros.edn[]
 (tlv-struct 2 (text "L" :math [:sub "P"])
   #(draw-box "Product" {:span 4}))
 (tlv-struct 4 0x0a
-  #(draw-related-boxes [0x5 0x5 0x5 0x5 0x0 0x1 0x3 0xc]))
+  #(draw-box "Yet to decipher data" {:span 8}))
 (tlv-struct 5 0x16
-  #(draw-related-boxes [0x00 0x02 0x0f 0x00 0x0f 0x04 0x05 0x01 0x00 0x0e 0x0d 0x03 0x00 0x0a 0x02 0x0c 0x01 0x00 0x04 0x02]))
+  #((draw-box "Yet to decipher data" [{:span 16} :box-above])
+    (draw-box "" {:span 4})))
 
 (draw-padding 0x40)
 ----
