@@ -138,6 +138,13 @@ include::partial$custom_macros.edn[]
 (draw-padding 0x40)
 ----
 
+CAUTION: The meaning of the bytes marked "Yet to decipher data" 
+is currently unknown, but essential for establishing a successful
+handshake! Simply replaying values previously captured doesn't work as these
+have to be unique for each connection request. Simply sending random data
+doesn't work as well. However, it has been observed, that each of these bytes
+only contain values from `0x00` to `0x0f`.
+
 == TLV Types
 [options="header"]
 |=== 
