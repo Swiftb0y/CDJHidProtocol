@@ -9,12 +9,8 @@ content:
     start_path: ./
 asciidoc:
   extensions:
-  - asciidoctor-mathjax
-plugins:
-  - path: antora-generic-svg-extension-plugin
-    config:
-      generator: bytefield-svg
-      name: bytefield
+  - "@deepsymmetry/asciidoctor-bytefield"
+
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
