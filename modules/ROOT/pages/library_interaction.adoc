@@ -33,7 +33,6 @@ ID in the following bitfield:
 [bytefield]
 ----
 include::example$bitfield.edn[]
-(create-bitfield-env)
 
 (draw-box "S")
 (draw-box "icon ID" {:span 7})
