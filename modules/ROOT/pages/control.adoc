@@ -30,7 +30,7 @@ even into single bits
 | `0x03`
 |[bytefield]
 ----
-include::partial$bitfield.edn[]
+include::example$bitfield.edn[]
 
 (create-bitfield-env)
 (draw-related-boxes (number-as-bits 2r10000000 8))
@@ -40,7 +40,7 @@ include::partial$bitfield.edn[]
 | `0x04`
 |[bytefield]
 ----
-include::partial$bitfield.edn[]
+include::example$bitfield.edn[]
 
 (create-bitfield-env)
 (draw-related-boxes (number-as-bits 2r10000000 8))
@@ -50,7 +50,7 @@ include::partial$bitfield.edn[]
 | `0x0d`
 |[bytefield]
 ----
-include::partial$bitfield.edn[]
+include::example$bitfield.edn[]
 
 (create-bitfield-env)
 (draw-related-boxes (number-as-bits 2r11111111 8))
@@ -60,7 +60,7 @@ include::partial$bitfield.edn[]
 | `0x0e`
 |[bytefield]
 ----
-include::partial$bitfield.edn[]
+include::example$bitfield.edn[]
 
 (create-bitfield-env)
 (draw-related-boxes (number-as-bits 2r11111111 8))

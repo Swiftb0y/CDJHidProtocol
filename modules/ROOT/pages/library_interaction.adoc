@@ -32,7 +32,7 @@ ID in the following bitfield:
 
 [bytefield]
 ----
-include::partial$bitfield.edn[]
+include::example$bitfield.edn[]
 (create-bitfield-env)
 
 (draw-box "S")
