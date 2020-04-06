@@ -9,7 +9,6 @@ packets with a <<startup.adoc#simple-header, simple header>>
 [bytefield]
 ----
 include::example$common_header.edn[]
-include::partial$custom_macros.edn[]
 
 
 (draw-packet-header 0x21)
@@ -32,11 +31,9 @@ even into single bits
 |[bytefield]
 ----
 include::partial$bitfield.edn[]
-include::partial$custom_macros.edn[]
 
 (create-bitfield-env)
-(draw-box (bit-text 1))
-(draw-padding boxes-per-row (bit-text 0))
+(draw-related-boxes (number-as-bits 2r10000000 8))
 ----
 | Play LED
 
@@ -44,11 +41,9 @@ include::partial$custom_macros.edn[]
 |[bytefield]
 ----
 include::partial$bitfield.edn[]
-include::partial$custom_macros.edn[]
 
 (create-bitfield-env)
-(draw-box (bit-text 1))
-(draw-padding boxes-per-row (bit-text 0))
+(draw-related-boxes (number-as-bits 2r10000000 8))
 ----
 | Cue LED
 
@@ -56,10 +51,9 @@ include::partial$custom_macros.edn[]
 |[bytefield]
 ----
 include::partial$bitfield.edn[]
-include::partial$custom_macros.edn[]
 
 (create-bitfield-env)
-(draw-related-boxes (repeat 8 (bit-text 1)))
+(draw-related-boxes (number-as-bits 2r11111111 8))
 ----
 |needle position between the two currently adjacent beats. `0x00` being at the previous beat and `0xff` being at the next beat.
 
@@ -67,15 +61,10 @@ include::partial$custom_macros.edn[]
 |[bytefield]
 ----
 include::partial$bitfield.edn[]
-include::partial$custom_macros.edn[]
 
 (create-bitfield-env)
-(draw-related-boxes (repeat 8 (bit-text 1)))
+(draw-related-boxes (number-as-bits 2r11111111 8))
 ----
 | number of the previous beat in the current bar (1-based)
 
 |===
-
-
-
-.`0b1111_1111`

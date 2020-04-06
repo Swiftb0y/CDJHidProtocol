@@ -7,7 +7,7 @@ Nikolaus Einhauser
 It is possible to send library data to the CDJ by directly sending strings to
 the CDJ which are then displayed at their appropriate places. This is done by
 using a <<startup.adoc#extended-header,extended header packet>> (to allow the
-data to be fragmented over multiple packets). It follows a comparatively 
+data to be fragmented over multiple packets). It follows a comparatively
 simple format which allows to send strings to the nine library rows:
 
 image::CDJ-library-view.svg[CDJ library diagram, 700]
@@ -26,7 +26,7 @@ include::example$row_struct.edn[]
 (which the CDJ will prefix before the string)
 as well as whether the row in question is currently selected.
 The String is encoded as UTF-16LE and terminate with a null-byte (or rather two
-`0x00` bytes since the string is encoded as UTF-16). The information in the `I` 
+`0x00` bytes since the string is encoded as UTF-16). The information in the `I`
 byte stores whether the row in question is currently selected as well as the icon
 ID in the following bitfield:
 
@@ -59,14 +59,12 @@ to break up the buffer)
 
 [bytefield]
 ----
-include::partial$custom_macros.edn[]
-
 include::example$common_fragmented_header.edn[]
 include::example$row_struct.edn[]
 
 (draw-packet-header 0x2a "I" "L")
 
-(doseq [n (range 9)]  
+(doseq [n (range 9)]
   (row-struct n "Icon" #(draw-box "String" {:span 2})))
 
 (draw-padding 0x40)
