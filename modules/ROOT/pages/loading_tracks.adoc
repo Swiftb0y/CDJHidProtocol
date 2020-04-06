@@ -6,7 +6,7 @@ Nikolaus Einhauser
 
 When loading a track, the host has to send a sequence of complex packets
 to the CDJ. These contain not only the usual track metadata such as artist,
-track title, etc. but also DJ related metadata such as Hotcues (including their 
+track title, etc. but also DJ related metadata such as Hotcues (including their
 color), the tracks BPM, its waveform and more. This page will describe how
 exactly this is achieved via the CDJs HID protocol:
 
@@ -22,7 +22,7 @@ in `UTF-16LE` and terminated with a null byte (or rather two `00` bytes since th
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
-include::partial$fragmented_string_packet.edn[]
+include::example$fragmented_string_packet.edn[]
 
 (draw-string-packet 0x22 "Track title")
 ----
@@ -33,7 +33,7 @@ include::partial$fragmented_string_packet.edn[]
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
-include::partial$fragmented_string_packet.edn[]
+include::example$fragmented_string_packet.edn[]
 
 (draw-string-packet 0x23 "Artist")
 ----
@@ -43,7 +43,7 @@ include::partial$fragmented_string_packet.edn[]
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
-include::partial$fragmented_string_packet.edn[]
+include::example$fragmented_string_packet.edn[]
 
 (draw-string-packet 0x24 "Album")
 ----
@@ -56,12 +56,12 @@ BPM value by 100 before serializing)
 
 CAUTION: This only sets the average bpm metadata shown in the track details
 (when clicking the `INFO` button of the CDJ over the top of the screen).
-This has nothing to do with the the BPM displayed in the waveform view. 
+This has nothing to do with the the BPM displayed in the waveform view.
 
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
-include::partial$fragmented_string_packet.edn[]
+include::example$fragmented_string_packet.edn[]
 
 (draw-string-packet 0x25 "BPM")
 ----
@@ -72,7 +72,7 @@ include::partial$fragmented_string_packet.edn[]
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
-include::partial$fragmented_string_packet.edn[]
+include::example$fragmented_string_packet.edn[]
 
 (draw-string-packet 0x42 "Genre")
 ----
@@ -82,7 +82,7 @@ include::partial$fragmented_string_packet.edn[]
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
-include::partial$fragmented_string_packet.edn[]
+include::example$fragmented_string_packet.edn[]
 
 (draw-string-packet 0x43 "Composer")
 ----
@@ -92,7 +92,7 @@ include::partial$fragmented_string_packet.edn[]
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
-include::partial$fragmented_string_packet.edn[]
+include::example$fragmented_string_packet.edn[]
 
 (draw-string-packet 0x44 "Lyricist")
 ----

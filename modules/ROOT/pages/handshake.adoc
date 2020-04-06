@@ -14,7 +14,7 @@ Packet of the handshake procedure:
 
 NOTE: USB-Devices are by definition unable to send data to the host on their
 own. The host instead has to constantly pull for changes. So make sure the
-Software running on the host is doing that before connecting initiating the 
+Software running on the host is doing that before connecting initiating the
 connection on the CDJ.
 
 [bytefield]
@@ -22,12 +22,10 @@ connection on the CDJ.
 include::example$tlv_struct.edn[]
 include::example$common_fragmented_header.edn[]
 
-include::partial$custom_macros.edn[]
-
 (draw-packet-header 0xf0 1 1)
-(tlv-struct 
+(tlv-struct
   (hex-text 0x11 2 :bold)
-  4 
+  4
   #(draw-related-boxes [0x01 0x04 0x01 0x55]))
 
 (draw-padding 0x40)
@@ -42,12 +40,10 @@ At this point the host has to respond with the following message:
 include::example$tlv_struct.edn[]
 include::example$common_fragmented_header.edn[]
 
-include::partial$custom_macros.edn[]
-
 
 (draw-packet-header 0xf0 1 1)
 
-(tlv-struct 
+(tlv-struct
   (hex-text 0x12 2 :bold)
   "L")
 (tlv-struct 1 (text "L" :math [:sub "M"])
@@ -74,12 +70,10 @@ This is followed up by response from the CDJ:
 include::example$tlv_struct.edn[]
 include::example$common_fragmented_header.edn[]
 
-include::partial$custom_macros.edn[]
-
 
 (draw-packet-header 0xf0 1 1)
 
-(tlv-struct 
+(tlv-struct
   (hex-text 0x13 2 :bold)
   "L")
 (tlv-struct 1 (text "L" :math [:sub "M"])
@@ -101,12 +95,10 @@ Which is then again followed up by a packet from the host.
 include::example$tlv_struct.edn[]
 include::example$common_fragmented_header.edn[]
 
-include::partial$custom_macros.edn[]
-
 
 (draw-packet-header 0xf0 1 2)
 
-(tlv-struct 
+(tlv-struct
   (hex-text 0x14 2 :bold)
   "L")
 (tlv-struct 1 (text "L" :math [:sub "M"])
@@ -129,8 +121,6 @@ The Handshake ends with an acknowledgment from the CDJ:
 include::example$common_fragmented_header.edn[]
 include::example$tlv_struct.edn[]
 
-include::partial$custom_macros.edn[]
-
 (draw-packet-header 0xf0 2 2)
 
 (tlv-struct (hex-text 0x15 2 :bold) 2)
@@ -138,7 +128,7 @@ include::partial$custom_macros.edn[]
 (draw-padding 0x40)
 ----
 
-CAUTION: The meaning of the bytes marked "Yet to decipher data" 
+CAUTION: The meaning of the bytes marked "Yet to decipher data"
 is currently unknown, but essential for establishing a successful
 handshake! Simply replaying values previously captured doesn't work as these
 have to be unique for each connection request. Simply sending random data
@@ -147,8 +137,8 @@ only contain values from `0x00` to `0x0f`.
 
 == TLV Types
 [options="header"]
-|=== 
-| TLV Type | Description | Direction 
+|===
+| TLV Type | Description | Direction
 
 | `0x01`   | Contains the Name of the manufacturer.footnote:direction[Refers to the Software or Hardware depending on the message direction.]footnote:asciistring[String is serialized in ASCII] | Bidirectional
 | `0x02`   | Contains the Name of the Product.footnote:direction[]footnote:asciistring[] | Bidirectional
@@ -158,4 +148,4 @@ only contain values from `0x00` to `0x0f`.
 | `0x13`   | CDJ Handshake data packet | CDJ->Host only
 | `0x14`   | CDJ Handshake data packet response | Host->CDJ only
 | `0x15`   | CDJ Handshake completion  | CDJ->Host only
-|=== 
+|===
