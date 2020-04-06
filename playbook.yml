@@ -1,6 +1,6 @@
 site:
   title: Pioneer CDJ HID Analysis
-  # url: https://djl-analysis.deepsymmetry.org
+  url: https://mixb.me/CDJHidProtocol/
   start_page: hid-analysis::startup.adoc
 content:
   sources:
