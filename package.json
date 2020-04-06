@@ -4,11 +4,11 @@
   "dependencies": {},
   "devDependencies": {
     "@antora/cli": "^2.2.0",
-    "@deepsymmetry/asciidoctor-bytefield": "^1.0.0",
-    "antora-site-generator-lunr": "^0.3.0"
+    "@deepsymmetry/asciidoctor-bytefield": "^1.1.1",
+    "@antora/site-generator-default": "^2.2.0"
   },
   "scripts": {
-    "build": "DOCSEARCH_ENABLED=true DOCSEARCH_ENGINE=lunr npx antora --fetch --generator antora-site-generator-lunr ./playbook.yml"
+    "build": "npx antora --fetch ./playbook.yml"
   },
   "keywords": [
     "pioneer",
