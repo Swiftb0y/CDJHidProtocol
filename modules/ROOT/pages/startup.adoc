@@ -59,7 +59,7 @@ Some parts of the Protocol utilize a TLV structure:
 ----
 include::example$tlv_struct.edn[]
 
-(tlv-struct "T" "L" (fn [] (draw-gap) (draw-bottom)))
+(tlv-struct "T" "L" #((draw-gap) (draw-bottom)))
 
 ----
 
