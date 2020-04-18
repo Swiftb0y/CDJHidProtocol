@@ -4,10 +4,15 @@ Nikolaus Einhauser
 :toc:
 :experimental:
 
-== Handshake procedure
-
 Before the Host and the Controller can exchange any meaningful data,
-they have to carry out a handshake. This handshake is initiated via the
+they have to carry out a handshake. PioneerDJ implemented a simple
+https://en.wikipedia.org/wiki/Challenge%E2%80%93response_authentication[Challege-Response-Protocol]
+to authenticate the DJ software and the controller (presumably to be able to 
+charge licensing fees from 3rd party DJing software for being compatible with
+the CDJ). This is accomplished via a DLL called `libpcon.dll` which are included
+"Native Instruments TraktorDJ 2" and "SeratoDJ Pro" installations. The sole purpose
+of that DLL is to implement the logic required to carry out a successful handshake.
+The handshake is initiated via the
 CDJ by using the Link menu: `[LINK] > CONTROL MODE (CDJ) > USB MIDI`.
 This will cause the CDJ to start sending USB-MIDI packets and the first
 Packet of the handshake procedure:
@@ -16,6 +21,77 @@ NOTE: USB-Devices are by definition unable to send data to the host on their
 own. The host instead has to constantly pull for changes. So make sure the
 Software running on the host is doing that before connecting initiating the
 connection on the CDJ.
+
+== Serialization Specifics
+
+NOTE: in the following documentation, buffers and integer values are used
+interchangeably. All integers larger than one byte are always (de-)serialized
+in big-endian order.
+
+The handshake packets always have the following structure:
+
+[bytefield]
+----
+include::example$tlv_struct.edn[]
+include::example$common_fragmented_header.edn[]
+
+(draw-packet-header 0xf0 "I" "L")
+(tlv-struct
+  (text "T" :plain [:sub "S"])
+  (text "L" :plain [:sub "S"])
+  #())
+(tlv-struct "N" (text "L" :plain [:sub "N"])
+    #(draw-box "ArgN Payload" {:span 4}))
+(draw-gap "More Arguments")
+(draw-bottom)
+----
+
+Since the payload is of variable length and can exceed the length limit, the
+packet begins with an extended header. This is followed by the first TLV (which
+will be referred to as "super-tlv" for the rest of this doc) which contains
+a list of arguments. The "T" of the super-tlv indicates the current stage in the
+handshake procedure. The "L" of the super-tlv indicates the length of the entire
+payload including the TLV header (so for a payload with 9 Bytes length, the length
+of the TLV will be 9+2=11).
+
+.super-tlv stages
+[options="header"]
+|===
+| TLV Type | Description | Direction
+
+| `0x11`   | CDJ announces itself to the host | CDJ->Host only
+| `0x12`   | Host start the handshake by sending the CDJ the challenge | Host->CDJ only
+| `0x13`   | CDJ responds with response for the hosts challenge and its own challenge | CDJ->Host only
+| `0x14`   | Host responds with response to CDJs challenge and a vendor-specific device ID | Host->CDJ only
+| `0x15`   | CDJ confirms that a successful handshake was established  | CDJ->Host only
+|===
+
+Each argument is another TLV and follows the same rules as the super TLV.
+However, its type value indicates the purpose of the data transmitted, but the
+meaning of the payload changes based on the direction of transfer. It seems
+like the CDJ accepts the arguments in arbitrary order, but the following figures
+will reflect the ordering in which they were observed in the wild.
+
+.argument types
+[options="header"]
+|===
+| Argument Type | Description | Notes
+
+| `0x01`   | Manufacturer-name | ASCII encoded
+| `0x02`   | Product-name | ASCII encoded
+| `0x03`   | CDJ authentication | Buffer spread out
+| `0x04`   | Host authentication | Buffer spread out
+| `0x05`   | Vendor-specific device ID | Buffer spread out
+|===
+
+CAUTION: For unknown reasons, the buffers in the arguments `0x03`, `0x04` and
+`0x05` are spread out. Meaning each byte is split in half and serialized into 
+two bytes. So the buffer `[0x12,0x34]` will actually be transmitted as
+`[0x01, 0x02, 0x03, 0x04]`. When describing how the arguments will be formed,
+the compact version will always be assumed while the bytefield figures will
+contain the sizes of the spread out buffer as they are transmitted.
+
+== Handshake procedure
 
 [bytefield]
 ----
@@ -47,23 +123,19 @@ include::example$common_fragmented_header.edn[]
   (hex-text 0x12 2 :bold)
   "L")
 (tlv-struct 1 (text "L" :math [:sub "M"])
-  #(draw-box "Manufacturer" {:span 4}))
+  #(draw-box "Software-Manufacturer" {:span 6}))
 (tlv-struct 2 (text "L" :math [:sub "P"])
-  #(draw-box "Product" {:span 4}))
+  #(draw-box "Software-Product" {:span 4}))
 (tlv-struct 3 18
-  #((draw-box "Yet to decipher data" [{:span 10} :box-above])
-    (draw-box "" [{:span 6} :box-below])))
+  #((draw-box "SeedA" [{:span 8} :box-above])
+    (draw-box "" [{:span 8} :box-below])))
 
 (draw-padding 0x40)
 
 ----
 
-The packet consists of an extended header and a TLV structure which
-contains another three TLV structures in sequence.
-Values seen so far for manufacturer are "PioneerDJ" and "NativeInstruments"
-as well as "CDJ2000NXS2", "rekordbox" and "TraktorPro2" for the product.
-
-This is followed up by response from the CDJ:
+After the host has sent its challenge packet, the CDJ will respond with the
+following:
 
 [bytefield]
 ----
@@ -81,9 +153,9 @@ include::example$common_fragmented_header.edn[]
 (tlv-struct 2 (text "L" :math [:sub "P"])
   #(draw-box "Product" {:span 4}))
 (tlv-struct 4 0x0a
-  #(draw-box "Yet to decipher data" {:span 8}))
+  #(draw-box "HashA" {:span 8}))
 (tlv-struct 3 0xd
-  #(draw-box "Yet to decipher data" {:span 0xb}))
+  #(draw-box "SeedE" {:span 0xb}))
 
 (draw-padding 0x40)
 ----
@@ -106,10 +178,10 @@ include::example$common_fragmented_header.edn[]
 (tlv-struct 2 (text "L" :math [:sub "P"])
   #(draw-box "Product" {:span 4}))
 (tlv-struct 4 0x0a
-  #(draw-box "Yet to decipher data" {:span 8}))
+  #(draw-box "HashE" {:span 8}))
 (tlv-struct 5 0x16
-  #((draw-box "Yet to decipher data" [{:span 16} :box-above])
-    (draw-box "" {:span 4})))
+  #((draw-box "Vendor-specific device ID" [{:span 16} :box-above])
+    (draw-box "" [{:span 4} :box-below])))
 
 (draw-padding 0x40)
 ----
@@ -128,24 +200,96 @@ include::example$tlv_struct.edn[]
 (draw-padding 0x40)
 ----
 
-CAUTION: The meaning of the bytes marked "Yet to decipher data"
-is currently unknown, but essential for establishing a successful
-handshake! Simply replaying values previously captured doesn't work as these
-have to be unique for each connection request. Simply sending random data
-doesn't work as well. However, it has been observed, that each of these bytes
-only contain values from `0x00` to `0x0f`.
+In case anything goes wrong during the authentication steps, the
+CDJ will send a reset packet before starting the entire handshake from the
+beginning again. A reset packet contains no data and instead just all `0`:
 
-== TLV Types
+
+[bytefield]
+----
+(draw-column-headers)
+(draw-padding 0x40)
+----
+
+== "Cryptography"
+
+This section will describe in detail how the different transmitted parameters
+are generated. The authentication follows the simplest pattern of a mutual
+challenge-response authentication scheme: One party provides a challenge which
+the other party combines with a shared secret. This combined challenge is then
+hashed to form the actual response.
+The shared secret depends on the manufacturer of the DJ software trying to
+communicate with the device in question. The secret is formed by XORing `SeedE`
+with the manufacturer-dependent value (which are hardcoded into the CDJs firmware):
+
+.Manufacturer-dependent secret input
 [options="header"]
 |===
-| TLV Type | Description | Direction
+| Manufacturer      | Value
 
-| `0x01`   | Contains the Name of the manufacturer.footnote:direction[Refers to the Software or Hardware depending on the message direction.]footnote:asciistring[String is serialized in ASCII] | Bidirectional
-| `0x02`   | Contains the Name of the Product.footnote:direction[]footnote:asciistring[] | Bidirectional
-| `0x03`, `0x04`, `0x05` | Format currently unknown, but it is expected that just replaying the values in the diagram should work.  | Bidirectional
-| `0x11`   | Handshake initialization | CDJ->Host only
-| `0x12`   | Handshake initialization response | Host->CDJ only
-| `0x13`   | CDJ Handshake data packet | CDJ->Host only
-| `0x14`   | CDJ Handshake data packet response | Host->CDJ only
-| `0x15`   | CDJ Handshake completion  | CDJ->Host only
+|	PioneerDJ         | 0x680131FB
+|	Serato            | 0x0D6F55AB
+|	NativeInstruments | 0x8C5B3F5D
+|	Atomix            | 0x97779123
+|	Algoriddim        | 0x384B522B
+|	Mixvibes          | 0x9EA1A8B6
+|	Numark            | 0x889127C7
+|	Dolby             | 0x7A2B59AB
 |===
+
+
+=== Hashing
+
+The engineers implemented their own one-way hash function which is not very
+complicated. Here is a complete reference implementation in python3.8:
+
+[source, python]
+----
+def hash(buff: bytes) -> int:
+  mask = 0x811c9dc5
+  for val in buff:
+    mask = ((val^mask) * 0x1000193) & 0xFFFFFFFF
+  return mask
+----
+
+=== Validating the CDJs response
+
+The CDJs response can be validated by simply calculating appending the common
+secret and `SeedE` to each other and hashing that: `hashAd = hash(seedA+secret)`
+
+If `hashAd` matches `hashA`, the CDJs response is valid.
+
+=== Building the response for the CDJ (`HashE`)
+
+Building `HashE` is just as simple as validating the CDJs response:
+`hashE = hash(seedE+secret)`
+
+=== Building the vendor-specific device ID
+
+The vendor-specific is static and can be taken from the following table:
+
+
+NOTE: *Contributions Wanted:* If you happen to have access to software
+from any of these manufacturers or hardware that is not yet registered, feel
+free to contact me by opening an issue on 
+https://github.com/Swiftb0y/CDJHidProtocol/[this projects github repository]
+
+.vendor-device ID index
+[options="header"]
+|===
+|               |     NativeInstruments    |          Serato          |         PioneerDJ        | Atomix | Algoriddim | Mixvibes | Numark | Dolby
+
+| *CDJ2000NXS2* | `0x02F2F4510ED30A2C1042` | `0XC0BD940FB700BB8FC75B` | `0x02F2F4510ED30A2C1042` | -- | -- | -- | -- | --
+| *DJM900NXS2*  | `0x43F4CDEE2C07C9590742` | `0xD557CE8F5EF07BC27E98` | --                       | -- | -- | -- | -- | --
+| *CDJTOUR1*    | `0x768DCEDA0DD7F010434E` | --                       | --                       | -- | -- | -- | -- | -- 
+| *DJMTOUR1*    | `0x502876738F3DC7CF1DA7` | --                       | --                       | -- | -- | -- | -- | -- 
+| *XDJ1000MK2*  | `0xABA778D3B506E22EBBAE` | --                       | --                       | -- | -- | -- | -- | -- 
+| *DJM450*      | `0x08EF3F2F1E7A9017F6AF` | --                       | --                       | -- | -- | -- | -- | -- 
+| *DJM250MK2*   | `0xD2F58B612C6206819139` | --                       | --                       | -- | -- | -- | -- | -- 
+| *DJM750MK2*   | `0x866E33BD04852E71ED21` | --                       | --                       | -- | -- | -- | -- | --
+| *DJMV10*      | `0x3C83DB259C76FE8DB2AB` | `0x1D3EAC55C613D297623D` | --                       | -- | -- | -- | -- | --
+| *XDJXZ*       | --                       | `0x2D99858D0A5A913D4EBD` | --                       | -- | -- | -- | -- | --
+|===
+
+NOTE: From my experiments, it looks like Atomix VirtualDJ actually poses
+as Rekordbox instead of using its own identifiers
