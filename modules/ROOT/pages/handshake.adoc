@@ -237,13 +237,35 @@ with the manufacturer-dependent value (which are hardcoded into the CDJs firmwar
 |	Dolby             | 0x7A2B59AB
 |===
 
+=== Generating SeedA
+
+The exact way seedA is generated is currently unknown. However, I was able
+to identify a pattern which is present when posing as seratoDJ or Traktor Pro 2.
+It seems like the algorithm generates two _ushorts_ (16bit unsigned integers)
+and then concats them after serializing them as _uints_ (32bit). So the
+resulting buffer could look like this (before being spaced out for actual
+transmission):
+
+[bytefield]
+----
+
+(defattrs :bg-green {:fill "#a0ffa0"})
+
+(def boxes-per-row 8)
+(draw-column-headers)
+(draw-boxes [0,0])
+(draw-boxes [0xff,0xff] :bg-green)
+(draw-boxes [0,0])
+(draw-boxes [0xff,0xff] :bg-green)
+
+----
 
 === Hashing
 
 The engineers implemented their own one-way hash function which is not very
 complicated. Here is a complete reference implementation in python3.8:
 
-[source, python]
+[source, python3]
 ----
 def hash(buff: bytes) -> int:
   mask = 0x811c9dc5
