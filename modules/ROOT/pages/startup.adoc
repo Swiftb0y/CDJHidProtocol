@@ -32,7 +32,8 @@ transmitting larger strings or other binary data such as images. For these purpo
 
 === Extended Header
 
-Packets with an extended header are able to transmit stem:[(\text{0x30} - 6)*2^8 = 14848] Bytes of data.
+Packets with an extended header are able to transmit stem:[(\text{0x40} - 6)*(2^(2*8)-1) = 3800972] Bytes (~3.8MB) of
+data.
 [bytefield]
 ----
 include::example$common_fragmented_header.edn[]
@@ -46,6 +47,7 @@ include::example$common_fragmented_header.edn[]
 
 `L` denotes the number of packets the data following
 takes up while `I` indicates the index of the packet fragment in the current stream.
+Both _ushorts_ encoded in little-endian byte order.
 
 
 .Currently known values for `type`
@@ -59,7 +61,7 @@ Some parts of the Protocol utilize a TLV structure:
 ----
 include::example$tlv_struct.edn[]
 
-(tlv-struct "T" "L" #((draw-gap) (draw-bottom)))
+(tlv-struct "T" "L" #(draw-gap-inline {:borders #{:right :left :top :bottom}}))
 
 ----
 
