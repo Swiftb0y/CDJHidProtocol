@@ -150,7 +150,10 @@ ID in the following bitfield:</p>
 <div class="content"><svg width="162" height="46" viewBox="0 0 162 46" ><text x="11" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >7</text><text x="31" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >6</text><text x="51" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >5</text><text x="71" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >4</text><text x="91" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >3</text><text x="111" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >2</text><text x="131" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >1</text><text x="151" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >0</text><line x1="1" y1="15" x2="21" y2="15" stroke="#000000" stroke-width="1" /><line x1="1" y1="45" x2="21" y2="45" stroke="#000000" stroke-width="1" /><line x1="21" y1="15" x2="21" y2="45" stroke="#000000" stroke-width="1" /><line x1="1" y1="15" x2="1" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="11" y="31" text-anchor="middle" dominant-baseline="middle" >S</text><line x1="21" y1="15" x2="161" y2="15" stroke="#000000" stroke-width="1" /><line x1="21" y1="45" x2="161" y2="45" stroke="#000000" stroke-width="1" /><line x1="161" y1="15" x2="161" y2="45" stroke="#000000" stroke-width="1" /><line x1="21" y1="15" x2="21" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="91" y="31" text-anchor="middle" dominant-baseline="middle" >icon ID</text></svg></div>
 </div>
 <div class="paragraph">
-<p>If the "S" bit is set, then that row is currently selected.</p>
+<p>If the "S" bit is set, then that row is currently selected.
+If multiple row-structs have this bit set, the CDJ will use
+the very first row where this occurs and ignores the bit on
+all rows after.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. Known Icon IDs</caption>
@@ -162,8 +165,8 @@ ID in the following bitfield:</p>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">ID</th>
-<th class="tableblock halign-left valign-top">Icon</th>
-<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Icon/Description</th>
+<th class="tableblock halign-left valign-top">Name/Notes</th>
 </tr>
 </thead>
 <tbody>
@@ -173,9 +176,19 @@ ID in the following bitfield:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t prefix any Icon</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x01</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">use empty icon (text uses the same offset as with an icon but without displaying an actual icon)</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/close_folder.jpg" alt="closed folder"></span> <span class="image"><img src="_images/cdj_icons/open_folder.jpg" alt="closed folder"></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Folder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/close_folder.jpg" alt="closed folder"></span> <span class="image"><img src="_images/cdj_icons/open_folder.jpg" alt="open folder"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Folder (depending on whether entry is selected or not)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/album.jpg" alt="album"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Album</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
@@ -183,12 +196,182 @@ ID in the following bitfield:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Musical 8th Note (used to indicate entry is a track)</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/open_folder.jpg" alt="open folder"></span> <span class="image"><img src="_images/cdj_icons/genre.jpg" alt="genre"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Open Folder / Genre (depending on whether entry is selected)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/artist.jpg" alt="artist"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Artist</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x07</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/playlist.jpg" alt="playlist icon"></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Document / Playlist / Fallback</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x08</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/playlist.jpg" alt="playlist icon"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Same as <code>0x08</code>?</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x09</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/time.jpg" alt="time"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0A</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/hot_cue.png" alt="hotcue"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Similar to the picture, but it displays a C instead of an H</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0B</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/bpm.jpg" alt="bpm"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BPM</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0C</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/label.jpg" alt="label"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Label</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0D</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/original_artist.jpg" alt="original artist"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Original Artist</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0E</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/remixer.jpg" alt="remixer"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Remixer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/playing.jpg" alt="playing"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Similar to the picture, but its instead a black playbutton on a green box.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x10</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/registered_in_tag_list.jpg" alt="registered in tag list"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Registered in Tag-list (but the checkmark is red instead of white)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x11</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">White Box with number in the middle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x12</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">White Box with number in the middle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x13</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">White Box with number in the middle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x14</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">White Box with number in the middle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x15</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/key.jpg" alt="key"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x16</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/bitrate.jpg" alt="bitrate"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bitrate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x17</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/year.jpg" alt="year"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Year</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x18</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Simple document icon</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x19</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/comment.jpg" alt="comment"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comment</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x1A</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/search.jpg" alt="search"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Search</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x1B</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/dj_play_count.jpg" alt="dj play count"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DJ Play Count</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x1C</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Black Cosinewave on white background</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">depicted from 0 to 3π radians</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x1D</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/date_library_added.jpg" alt="date library added"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date Library Added</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x1E</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color white"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color White</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x1F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color magenta"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Magenta</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x20</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color red"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Red</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x21</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color orange"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Orange</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x22</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color yellow"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Yellow</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x23</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color green"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Green</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x24</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color cyan"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Cyan</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x25</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color blue"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Blue</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x26</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="_images/cdj_icons/color.jpg" alt="color purple"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color Purple</p></td>
+</tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>These known Icon ID&#8217;s were collected from a CDJ-2000NXS2 with firmware
+version 1.85. Even though there are <code>0x7F</code>=128 possible icons, it seems like
+the library-view of the CDJ is only carrying 39 icons.</p>
+</div>
 <div class="paragraph">
 <p>These row-structs are then collected in a buffer and sent out using an
 <a href="startup.html#extended-header" class="page">extended header packet</a> (so you might have
@@ -196,6 +379,12 @@ to break up the buffer)</p>
 </div>
 <div class="imageblock bytefield">
 <div class="content"><svg width="681" height="136" viewBox="0 0 681 136" ><text x="60" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >0</text><text x="100" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >1</text><text x="140" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >2</text><text x="180" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >3</text><text x="220" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >4</text><text x="260" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >5</text><text x="300" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >6</text><text x="340" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >7</text><text x="380" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >8</text><text x="420" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >9</text><text x="460" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >a</text><text x="500" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >b</text><text x="540" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >c</text><text x="580" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >d</text><text x="620" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >e</text><text x="660" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >f</text><line x1="40" y1="15" x2="80" y2="15" stroke="#000000" stroke-width="1" /><line x1="40" y1="45" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="40" y1="15" x2="40" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><rect x="80" y="15" height="30" width="40" fill="#a0ffa0" /><line x1="80" y1="15" x2="120" y2="15" stroke="#000000" stroke-width="1" /><line x1="80" y1="45" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="31" text-anchor="middle" dominant-baseline="middle" >2a</text><rect x="120" y="15" height="30" width="40" fill="#80a0ff" /><line x1="120" y1="15" x2="160" y2="15" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="15" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="140" y="31" text-anchor="middle" dominant-baseline="middle" >I</text><line x1="160" y1="15" x2="200" y2="15" stroke="#000000" stroke-width="1" /><line x1="160" y1="45" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="15" x2="160" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><rect x="200" y="15" height="30" width="40" fill="#80a0ff" /><line x1="200" y1="15" x2="240" y2="15" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="15" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="220" y="31" text-anchor="middle" dominant-baseline="middle" >L</text><line x1="240" y1="15" x2="280" y2="15" stroke="#000000" stroke-width="1" /><line x1="240" y1="45" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="15" x2="240" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="260" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><rect x="280" y="15" height="30" width="40" fill="#80ffff" /><line x1="280" y1="15" x2="320" y2="15" stroke="#000000" stroke-width="1" /><line x1="280" y1="45" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="320" y1="15" x2="360" y2="15" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="340" y="31" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="360" y1="15" x2="400" y2="15" stroke="#000000" stroke-width="1" /><line x1="360" y1="45" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="400" y1="15" x2="440" y2="15" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="440" y1="15" x2="520" y2="15" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="520" y2="45" stroke="#000000" stroke-width="1" /><line x1="520" y1="15" x2="520" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="480" y="31" text-anchor="middle" dominant-baseline="middle" >String</text><rect x="520" y="15" height="30" width="40" fill="#80ffff" /><line x1="520" y1="15" x2="560" y2="15" stroke="#000000" stroke-width="1" /><line x1="520" y1="45" x2="560" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="15" x2="560" y2="45" stroke="#000000" stroke-width="1" /><line x1="520" y1="15" x2="520" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="31" text-anchor="middle" dominant-baseline="middle" >01</text><line x1="560" y1="15" x2="600" y2="15" stroke="#000000" stroke-width="1" /><line x1="560" y1="45" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="15" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="15" x2="560" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="580" y="31" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="600" y1="15" x2="640" y2="15" stroke="#000000" stroke-width="1" /><line x1="600" y1="45" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="15" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="15" x2="600" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="640" y1="15" x2="680" y2="15" stroke="#000000" stroke-width="1" /><line x1="640" y1="45" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line x1="680" y1="15" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="15" x2="640" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="30" text-anchor="end" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="60" text-anchor="end" >10</text><line x1="40" y1="45" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="40" y1="75" x2="120" y2="75" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="120" y2="75" stroke="#000000" stroke-width="1" /><line x1="40" y1="45" x2="40" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="80" y="61" text-anchor="middle" dominant-baseline="middle" >String</text><rect x="120" y="45" height="30" width="40" fill="#80ffff" /><line x1="120" y1="45" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="75" x2="160" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="45" x2="160" y2="75" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="120" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="61" text-anchor="middle" dominant-baseline="middle" >02</text><line x1="160" y1="45" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="160" y1="75" x2="200" y2="75" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="200" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="45" x2="160" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="180" y="61" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="200" y1="45" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="75" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="45" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="200" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="240" y1="45" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="240" y1="75" x2="280" y2="75" stroke="#000000" stroke-width="1" /><line x1="280" y1="45" x2="280" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="45" x2="240" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="260" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="280" y1="45" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="75" x2="360" y2="75" stroke="#000000" stroke-width="1" /><line x1="360" y1="45" x2="360" y2="75" stroke="#000000" stroke-width="1" /><line x1="280" y1="45" x2="280" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="320" y="61" text-anchor="middle" dominant-baseline="middle" >String</text><rect x="360" y="45" height="30" width="40" fill="#80ffff" /><line x1="360" y1="45" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="75" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="45" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line x1="360" y1="45" x2="360" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="61" text-anchor="middle" dominant-baseline="middle" >03</text><line x1="400" y1="45" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="400" y1="75" x2="440" y2="75" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="440" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="45" x2="400" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="420" y="61" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="440" y1="45" x2="480" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="75" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="45" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="440" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="480" y1="45" x2="520" y2="45" stroke="#000000" stroke-width="1" /><line x1="480" y1="75" x2="520" y2="75" stroke="#000000" stroke-width="1" /><line x1="520" y1="45" x2="520" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="45" x2="480" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="500" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="520" y1="45" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line x1="520" y1="75" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line x1="600" y1="45" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line x1="520" y1="45" x2="520" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="560" y="61" text-anchor="middle" dominant-baseline="middle" >String</text><rect x="600" y="45" height="30" width="40" fill="#80ffff" /><line x1="600" y1="45" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="75" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="45" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line x1="600" y1="45" x2="600" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="61" text-anchor="middle" dominant-baseline="middle" >04</text><line x1="640" y1="45" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line x1="640" y1="75" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line x1="680" y1="45" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="45" x2="640" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="660" y="61" text-anchor="middle" dominant-baseline="middle" >Icon</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="90" text-anchor="end" >20</text><line x1="40" y1="75" x2="80" y2="75" stroke="#000000" stroke-width="1" /><line x1="40" y1="105" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="75" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line x1="40" y1="75" x2="40" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="80" y1="75" x2="120" y2="75" stroke="#000000" stroke-width="1" /><line x1="80" y1="105" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line x1="120" y1="75" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="75" x2="80" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="120" y1="75" x2="200" y2="75" stroke="#000000" stroke-width="1" /><line x1="120" y1="105" x2="200" y2="105" stroke="#000000" stroke-width="1" /><line x1="200" y1="75" x2="200" y2="105" stroke="#000000" stroke-width="1" /><line x1="120" y1="75" x2="120" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="160" y="91" text-anchor="middle" dominant-baseline="middle" >String</text><rect x="200" y="75" height="30" width="40" fill="#80ffff" /><line x1="200" y1="75" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line x1="200" y1="105" x2="240" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="75" x2="240" y2="105" stroke="#000000" stroke-width="1" /><line x1="200" y1="75" x2="200" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="91" text-anchor="middle" dominant-baseline="middle" >05</text><line x1="240" y1="75" x2="280" y2="75" stroke="#000000" stroke-width="1" /><line x1="240" y1="105" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line x1="280" y1="75" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="75" x2="240" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="260" y="91" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="280" y1="75" x2="320" y2="75" stroke="#000000" stroke-width="1" /><line x1="280" y1="105" x2="320" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="75" x2="320" y2="105" stroke="#000000" stroke-width="1" /><line x1="280" y1="75" x2="280" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="320" y1="75" x2="360" y2="75" stroke="#000000" stroke-width="1" /><line x1="320" y1="105" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line x1="360" y1="75" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="75" x2="320" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="340" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="360" y1="75" x2="440" y2="75" stroke="#000000" stroke-width="1" /><line x1="360" y1="105" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line x1="440" y1="75" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line x1="360" y1="75" x2="360" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="400" y="91" text-anchor="middle" dominant-baseline="middle" >String</text><rect x="440" y="75" height="30" width="40" fill="#80ffff" /><line x1="440" y1="75" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line x1="440" y1="105" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="75" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line x1="440" y1="75" x2="440" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="91" text-anchor="middle" dominant-baseline="middle" >06</text><line x1="480" y1="75" x2="520" y2="75" stroke="#000000" stroke-width="1" /><line x1="480" y1="105" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line x1="520" y1="75" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="75" x2="480" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="500" y="91" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="520" y1="75" x2="560" y2="75" stroke="#000000" stroke-width="1" /><line x1="520" y1="105" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="75" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line x1="520" y1="75" x2="520" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="560" y1="75" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line x1="560" y1="105" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line x1="600" y1="75" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="75" x2="560" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="600" y1="75" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line x1="600" y1="105" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line x1="680" y1="75" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line x1="600" y1="75" x2="600" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="640" y="91" text-anchor="middle" dominant-baseline="middle" >String</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="120" text-anchor="end" >30</text><rect x="40" y="105" height="30" width="40" fill="#80ffff" /><line x1="40" y1="105" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line x1="40" y1="135" x2="80" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="105" x2="80" y2="135" stroke="#000000" stroke-width="1" /><line x1="40" y1="105" x2="40" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="121" text-anchor="middle" dominant-baseline="middle" >07</text><line x1="80" y1="105" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line x1="80" y1="135" x2="120" y2="135" stroke="#000000" stroke-width="1" /><line x1="120" y1="105" x2="120" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="105" x2="80" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="100" y="121" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="120" y1="105" x2="160" y2="105" stroke="#000000" stroke-width="1" /><line x1="120" y1="135" x2="160" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="105" x2="160" y2="135" stroke="#000000" stroke-width="1" /><line x1="120" y1="105" x2="120" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="160" y1="105" x2="200" y2="105" stroke="#000000" stroke-width="1" /><line x1="160" y1="135" x2="200" y2="135" stroke="#000000" stroke-width="1" /><line x1="200" y1="105" x2="200" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="105" x2="160" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="200" y1="105" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line x1="200" y1="135" x2="280" y2="135" stroke="#000000" stroke-width="1" /><line x1="280" y1="105" x2="280" y2="135" stroke="#000000" stroke-width="1" /><line x1="200" y1="105" x2="200" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="240" y="121" text-anchor="middle" dominant-baseline="middle" >String</text><rect x="280" y="105" height="30" width="40" fill="#80ffff" /><line x1="280" y1="105" x2="320" y2="105" stroke="#000000" stroke-width="1" /><line x1="280" y1="135" x2="320" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="105" x2="320" y2="135" stroke="#000000" stroke-width="1" /><line x1="280" y1="105" x2="280" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="121" text-anchor="middle" dominant-baseline="middle" >08</text><line x1="320" y1="105" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line x1="320" y1="135" x2="360" y2="135" stroke="#000000" stroke-width="1" /><line x1="360" y1="105" x2="360" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="105" x2="320" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="340" y="121" text-anchor="middle" dominant-baseline="middle" >Icon</text><line x1="360" y1="105" x2="400" y2="105" stroke="#000000" stroke-width="1" /><line x1="360" y1="135" x2="400" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="400" y2="135" stroke="#000000" stroke-width="1" /><line x1="360" y1="105" x2="360" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="400" y1="105" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line x1="400" y1="135" x2="440" y2="135" stroke="#000000" stroke-width="1" /><line x1="440" y1="105" x2="440" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="400" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="440" y1="105" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line x1="440" y1="135" x2="520" y2="135" stroke="#000000" stroke-width="1" /><line x1="520" y1="105" x2="520" y2="135" stroke="#000000" stroke-width="1" /><line x1="440" y1="105" x2="440" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="480" y="121" text-anchor="middle" dominant-baseline="middle" >String</text><line x1="520" y1="105" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line x1="520" y1="135" x2="560" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="560" y2="135" stroke="#000000" stroke-width="1" /><line x1="520" y1="105" x2="520" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="560" y1="105" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line x1="560" y1="135" x2="600" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="600" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="560" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="600" y1="105" x2="640" y2="105" stroke="#000000" stroke-width="1" /><line x1="600" y1="135" x2="640" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="640" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="600" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="640" y1="105" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line x1="640" y1="135" x2="680" y2="135" stroke="#000000" stroke-width="1" /><line x1="680" y1="105" x2="680" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="640" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="121" text-anchor="middle" dominant-baseline="middle" >00</text></svg></div>
+</div>
+<div class="paragraph">
+<p>The CDJ accepts row-structs in any order. When it receives a
+row struct with an out-of-bounds number, it will stop
+processing the instructions immediately, thus leaving every
+unprocessed line blank.</p>
 </div>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

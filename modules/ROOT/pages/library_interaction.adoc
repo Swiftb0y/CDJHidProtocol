@@ -39,18 +39,61 @@ include::example$bitfield.edn[]
 ----
 
 If the "S" bit is set, then that row is currently selected.
+If multiple row-structs have this bit set, the CDJ will use
+the very first row where this occurs and ignores the bit on
+all rows after.
 
 .Known Icon IDs
 [options="header"]
 |===
-|   ID  | Icon | Description
+|   ID  | Icon/Description | Name/Notes
 
 | `0x00` |  --  | Don't prefix any Icon
-| `0x02` | image:cdj_icons/close_folder.jpg[closed folder] image:cdj_icons/open_folder.jpg[closed folder] | Folder
+| `0x01` |      | use empty icon (text uses the same offset as with an icon but without displaying an actual icon)
+| `0x02` | image:cdj_icons/close_folder.jpg[closed folder] image:cdj_icons/open_folder.jpg[open folder] | Folder (depending on whether entry is selected or not)
+| `0x03` | image:cdj_icons/album.jpg[album] | Album
 | `0x04` | image:cdj_icons/track_file_name.jpg[track / filename] | Musical 8th Note (used to indicate entry is a track)
+| `0x05` | image:cdj_icons/open_folder.jpg[open folder] image:cdj_icons/genre.jpg[genre] | Open Folder / Genre (depending on whether entry is selected)
+| `0x06` | image:cdj_icons/artist.jpg[artist] | Artist
 | `0x07` | image:cdj_icons/playlist.jpg[playlist icon] | Document / Playlist / Fallback
+| `0x08` | image:cdj_icons/playlist.jpg[playlist icon] | Same as `0x08`?
+| `0x09` | image:cdj_icons/time.jpg[time] | Time
+| `0x0A` | image:cdj_icons/hot_cue.png[hotcue] | Similar to the picture, but it displays a C instead of an H
+| `0x0B` | image:cdj_icons/bpm.jpg[bpm] | BPM
+| `0x0C` | image:cdj_icons/label.jpg[label] | Label
+| `0x0D` | image:cdj_icons/original_artist.jpg[original artist] | Original Artist
+| `0x0E` | image:cdj_icons/remixer.jpg[remixer] | Remixer
+| `0x0F` | image:cdj_icons/playing.jpg[playing] | Similar to the picture, but its instead a black playbutton on a green box.
+| `0x10` | image:cdj_icons/registered_in_tag_list.jpg[registered in tag list] | Registered in Tag-list (but the checkmark is red instead of white)
+| `0x11` | White Box with number in the middle | 1
+| `0x12` | White Box with number in the middle | 2
+| `0x13` | White Box with number in the middle | 3
+| `0x14` | White Box with number in the middle | 4
+| `0x15` | image:cdj_icons/key.jpg[key] | Key
+| `0x16` | image:cdj_icons/bitrate.jpg[bitrate] | Bitrate
+| `0x17` | image:cdj_icons/year.jpg[year] | Year
+| `0x18` | Simple document icon | 
+| `0x19` | image:cdj_icons/comment.jpg[comment] | Comment
+| `0x1A` | image:cdj_icons/search.jpg[search] | Search
+| `0x1B` | image:cdj_icons/dj_play_count.jpg[dj play count] | DJ Play Count
+| `0x1C` | Black Cosinewave on white background | depicted from 0 to 3π radians
+| `0x1D` | image:cdj_icons/date_library_added.jpg[date library added] | Date Library Added
+| `0x1E` | image:cdj_icons/color.jpg[color white] | Color White
+| `0x1F` | image:cdj_icons/color.jpg[color magenta] | Color Magenta
+| `0x20` | image:cdj_icons/color.jpg[color red] | Color Red
+| `0x21` | image:cdj_icons/color.jpg[color orange] | Color Orange
+| `0x22` | image:cdj_icons/color.jpg[color yellow] | Color Yellow
+| `0x23` | image:cdj_icons/color.jpg[color green] | Color Green
+| `0x24` | image:cdj_icons/color.jpg[color cyan] | Color Cyan
+| `0x25` | image:cdj_icons/color.jpg[color blue] | Color Blue
+| `0x26` | image:cdj_icons/color.jpg[color purple] | Color Purple
+
 |===
 
+
+These known Icon ID's were collected from a CDJ-2000NXS2 with firmware
+version 1.85. Even though there are `0x7F`=128 possible icons, it seems like
+the library-view of the CDJ is only carrying 39 icons.
 
 These row-structs are then collected in a buffer and sent out using an
 <<startup.adoc#extended-header,extended header packet>> (so you might have
@@ -68,3 +111,8 @@ include::example$row_struct.edn[]
 
 (draw-padding 0x40)
 ----
+
+The CDJ accepts row-structs in any order. When it receives a
+row struct with an out-of-bounds number, it will stop
+processing the instructions immediately, thus leaving every
+unprocessed line blank.
