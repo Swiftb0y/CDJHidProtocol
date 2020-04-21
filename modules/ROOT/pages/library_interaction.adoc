@@ -4,6 +4,7 @@ Nikolaus Einhauser
 :toc:
 :experimental:
 
+== Controlling the left rows
 It is possible to send library data to the CDJ by directly sending strings to
 the CDJ which are then displayed at their appropriate places. This is done by
 using a <<startup.adoc#extended-header,extended header packet>> (to allow the
@@ -118,3 +119,29 @@ processing the instructions immediately, thus leaving every
 unprocessed line blank. The CDJ ignores any icon instruction
 when the provided text for that row is empty.
 
+== Sending Album Art
+
+image::CDJ-library-view-album-placeholder.svg[CDJ library view album, 700]
+
+Sending Album art is accomplished via a fragmented header but overall pretty
+straightforward:
+
+[bytefield]
+----
+include::example$common_fragmented_header.edn[]
+
+
+(draw-packet-header 0xf0 "I" "L")
+
+(draw-box "Length" {:span 2})
+(draw-gap "JPG Data")
+(draw-bottom)
+----
+
+The "Length" field denotes size of the JPG Data in Bytes. It seems like the CDJ
+only accepts images in jpg form. Since the "Length"
+field is a _ushort_, the upper limit for the jpg buffersize is
+stem:[2^16 = 65536] Bytes. It has also been discovered, that the CDJ can have
+trouble with certain metadata and rejects the image when encountering them. Thus
+it is advisable to strip the jpg of as much metadata as possible not only to 
+counteract this behavior, but also to reduce the buffersize and save bandwidth.
