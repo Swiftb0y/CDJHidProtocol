@@ -65,10 +65,10 @@ all rows after.
 | `0x0E` | image:cdj_icons/remixer.jpg[remixer] | Remixer
 | `0x0F` | image:cdj_icons/playing.jpg[playing] | Similar to the picture, but its instead a black playbutton on a green box.
 | `0x10` | image:cdj_icons/registered_in_tag_list.jpg[registered in tag list] | Registered in Tag-list (but the checkmark is red instead of white)
-| `0x11` | White Box with number in the middle | 1
-| `0x12` | White Box with number in the middle | 2
-| `0x13` | White Box with number in the middle | 3
-| `0x14` | White Box with number in the middle | 4
+| `0x11` | image:custom_cdj_icons/button_1.svg[button 1, 48] | Button 1
+| `0x12` | image:custom_cdj_icons/button_2.svg[button 2, 48] | Button 2
+| `0x13` | image:custom_cdj_icons/button_3.svg[button 3, 48] | Button 3
+| `0x14` | image:custom_cdj_icons/button_4.svg[button 4, 48] | Button 4
 | `0x15` | image:cdj_icons/key.jpg[key] | Key
 | `0x16` | image:cdj_icons/bitrate.jpg[bitrate] | Bitrate
 | `0x17` | image:cdj_icons/year.jpg[year] | Year
@@ -117,3 +117,4 @@ row struct with an out-of-bounds number, it will stop
 processing the instructions immediately, thus leaving every
 unprocessed line blank. The CDJ ignores any icon instruction
 when the provided text for that row is empty.
+
