@@ -72,11 +72,11 @@ all rows after.
 | `0x15` | image:cdj_icons/key.jpg[key] | Key
 | `0x16` | image:cdj_icons/bitrate.jpg[bitrate] | Bitrate
 | `0x17` | image:cdj_icons/year.jpg[year] | Year
-| `0x18` | Simple document icon | 
+| `0x18` | image:custom_cdj_icons/file.svg[file, 48] | Document / File
 | `0x19` | image:cdj_icons/comment.jpg[comment] | Comment
 | `0x1A` | image:cdj_icons/search.jpg[search] | Search
 | `0x1B` | image:cdj_icons/dj_play_count.jpg[dj play count] | DJ Play Count
-| `0x1C` | Black Cosinewave on white background | depicted from 0 to 3π radians
+| `0x1C` | image:custom_cdj_icons/cosine_wave.svg[cosine wave, 48] | Cosine wave depicted from 0 to 3π radians
 | `0x1D` | image:cdj_icons/date_library_added.jpg[date library added] | Date Library Added
 | `0x1E` | image:cdj_icons/color.jpg[color white] | Color White
 | `0x1F` | image:cdj_icons/color.jpg[color magenta] | Color Magenta
@@ -115,4 +115,5 @@ include::example$row_struct.edn[]
 The CDJ accepts row-structs in any order. When it receives a
 row struct with an out-of-bounds number, it will stop
 processing the instructions immediately, thus leaving every
-unprocessed line blank.
+unprocessed line blank. The CDJ ignores any icon instruction
+when the provided text for that row is empty.
