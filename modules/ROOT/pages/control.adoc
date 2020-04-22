@@ -14,8 +14,8 @@ include::example$common_header.edn[]
 (draw-packet-header 0x21)
 
 (draw-box nil [{:span 14} :box-above])
-(draw-box "Controller control data" [ :box-middle {:span 16}])
-(draw-box nil [:box-middle {:span 16}])
+(draw-box "Controller control data" [ :box-related {:span 16}])
+(draw-box nil [:box-related {:span 16}])
 (draw-box nil [{:span 16} :box-below])
 
 ----

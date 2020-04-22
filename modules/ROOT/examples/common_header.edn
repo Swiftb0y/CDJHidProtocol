@@ -5,8 +5,6 @@
 ;; Some nice default background colors, used to distinguish header sections.
 (defattrs :bg-green {:fill "#a0ffa0"})
 
-(defattrs :box-middle {:borders #{:left :right}})
-
 (defn draw-packet-header
   "Generates the byte labels and first two rows of a standard DJ Link
   startup packet with the specified `kind` byte."
