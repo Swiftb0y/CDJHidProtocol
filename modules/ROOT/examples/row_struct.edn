@@ -1,10 +1,13 @@
 
 (defattrs :bg-cyan {:fill "#80ffff"})
+(defattrs :bg-yellow {:fill "#ffff80"})
+(defattrs :bg-magenta {:fill "#ff80ff"})
 
 (defn row-struct
-  ([r i] (row-struct r i #(draw-related-boxes [0 0])))
-  ([row icon string]
+  ([r i] (row-struct r i 0 #(draw-related-boxes [0 0])))
+  ([row icon color string]
    (draw-box row [:bg-cyan :box-first])
-   (draw-box icon :box-last)
-   (draw-related-boxes [0 0])
+   (draw-box icon [:bg-magenta :box-related])
+   (draw-box color [:bg-yellow :box-last])
+   (draw-box 0)
    (when string (string))))

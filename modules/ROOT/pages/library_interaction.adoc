@@ -20,12 +20,13 @@ Each zone can be controlled using a row-struct:
 ----
 include::example$row_struct.edn[]
 
-(row-struct "R" "I" #((draw-gap "UTF-16LE String")  (draw-bottom)))
+(row-struct "R" "I" "C" #((draw-gap "UTF-16LE String")  (draw-bottom)))
 
 ----
 `R` indicates the row number while `I` indicates an the ID of the optional Icon
 (which the CDJ will prefix before the string)
 as well as whether the row in question is currently selected.
+`C` controls the color of the text in the current row.
 The String is encoded as UTF-16LE and terminate with a null-byte (or rather two
 `0x00` bytes since the string is encoded as UTF-16). The information in the `I`
 byte stores whether the row in question is currently selected as well as the icon
@@ -43,6 +44,28 @@ If the "S" bit is set, then that row is currently selected.
 If multiple row-structs have this bit set, the CDJ will use
 the very first row where this occurs and ignores the bit on
 all rows after.
+
+
+.Row Textcolor codes
+[options="header"]
+|===
+|  Code  | Color | Notes
+
+| `0x00` | White | Adjusted for contrast when selected
+| `0x01` | Gray  | Adjusted for contrast when selected
+| `0x02` | Green | Adjusted for contrast when selected
+| `0x03` | Dark Green / Olive | Adjusted for contrast when selected
+| `0x04` | Magenta | 
+| `0x05` |   Red  | 
+| `0x06` | Orange | 
+| `0x07` | Yellow | 
+| `0x08` | Green  | 
+| `0x09` |  Cyan  | 
+| `0x0a` |  Blue  | 
+| `0x0b` | Purple | 
+
+|===
+
 
 .Known Icon IDs
 [options="header"]
@@ -108,7 +131,7 @@ include::example$row_struct.edn[]
 (draw-packet-header 0x2a "I" "L")
 
 (doseq [n (range 9)]
-  (row-struct n "Icon" #(draw-box "String" {:span 2})))
+  (row-struct n "Icon" "C" #(draw-box "String" {:span 2})))
 
 (draw-padding 0x40)
 ----
