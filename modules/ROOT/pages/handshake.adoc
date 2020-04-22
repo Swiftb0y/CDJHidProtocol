@@ -315,3 +315,18 @@ https://github.com/Swiftb0y/CDJHidProtocol/[this projects github repository]
 
 NOTE: From my experiments, it looks like Atomix VirtualDJ actually poses
 as Rekordbox instead of using its own identifiers
+
+== Keepalive
+
+Once a successful handshake occurred, the host has to keep the connection alive
+by sending packets at least once per second. However, it is recommended to send
+a packet at least every 400ms since that has been observed in tests with
+commercial DJing software. In order to keep the connection alive in cases where
+the host has no new information to update the CDJ with, the CDJ also accepts
+empty packets:
+
+[bytefield]
+----
+(draw-column-headers)
+(draw-padding 0x40)
+----
