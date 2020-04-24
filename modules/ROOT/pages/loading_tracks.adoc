@@ -67,6 +67,22 @@ include::example$fragmented_string_packet.edn[]
 ----
 
 
+== Key
+
+[bytefield]
+----
+include::example$common_header.edn[]
+
+(draw-packet-header 0x41)
+(draw-box "Key"{:span 5})
+(draw-padding 0x40)
+----
+
+The While it's certainly possible to send more than five Bytes for the key,
+The CDJ truncates it automatically after the fifth so prevent overflowing the 
+screen. Contrary to the other packet types such as Artist or Tracktitle, the CDJ
+only accepts ASCII-encoded strings in this packet.
+
 == Genre
 
 [bytefield]
