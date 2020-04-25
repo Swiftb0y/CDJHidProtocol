@@ -13,7 +13,7 @@ the CDJ). This is accomplished via a DLL called `libpcon.dll` which are included
 "Native Instruments TraktorDJ 2" and "SeratoDJ Pro" installations. The sole purpose
 of that DLL is to implement the logic required to carry out a successful handshake.
 The handshake is initiated via the
-CDJ by using the Link menu: `[LINK] > CONTROL MODE (CDJ) > USB MIDI`.
+CDJ by using the Link menu: menu:LINK[CONTROL MODE (CDJ) > USB MIDI].
 This will cause the CDJ to start sending USB-MIDI packets and the first
 Packet of the handshake procedure:
 
