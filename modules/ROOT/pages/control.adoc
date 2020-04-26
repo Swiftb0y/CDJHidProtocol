@@ -1,66 +1,334 @@
-= Control Packets
+= Library interaction
+Nikolaus Einhauser
+:icons: font
+:toc:
+:experimental:
 
-== Controlling LEDs on the CDJ
+This Page contains contains documentation for the simple IO protocol used to
+control the LEDs on the CDJ or detecting whether the user
+interacted with a physical control (such as buttons, knobs, etc).
 
-Controlling LEDs on the CDJ can by accomplished by sending
-packets with a <<startup.adoc#simple-header, simple header>>
+Communication in both directions uses a simple header with types `0x20` (input)
+or `0x21` (output).
+Both packets contain a single structure with fixed offsets (similar to 
+the structure of packets exchanged by simpler HID controllers). Since the
+information is very tightly packed, a bytefield diagram is not able to describe
+the structure in enough detail, thus it will be described in table form. This
+table has a Column `Bytes` which identifies the position of the Byte or Bytes
+in question from the very start of the message. Moreover, the Column `Mask`
+contains a Mask (or an expression evaluating to mask) to be applied to the
+current Byte(s) to identify the exact
+Bit(s) in question. `Control` will hold the label of the control seen on the CDJ
+or an otherwise descriptive name in case the label isn't present, while
+`Notes` will contain further explanation on the current Control
+in case that's required. `Type` indicates the physical type of control.
 
+== CDJ->Host
+The Host seems to poll control messages from the host roughly every 100ms
+(TODO: seems low, need verification).
+When the `Type` describes a button, the bit being set means that the Button
+is currently being pressed while an unset bit indicates the opposite.
+All bytes that express values within a range are generally mapped linearly
+to their physical control.
 
+.CDJ to Host message offsets
+[options="header",cols="1,1,1,1,2a"]
+|===
+| Bytes  |   Mask   | Type | Control | Notes
+| *`0x00`* |  `0xFF`  |  --  |   --    | First Byte of is always `0x00`
+| *`0x01`* |  `0xFF`  |  --  | `0x20`  | Message Type `0x20`
+| *`0x02`* | `(1<<7)` | Button | Play/Pause | 
+| `0x02` | `(1<<6)` | Button | Cue | 
+| `0x02` | `(1<<5)` | Button | Search forward | 
+| `0x02` | `(1<<4)` | Button | Search backward | 
+| `0x02` | `(1<<3)` | Button | Track Search forward | 
+| `0x02` | `(1<<2)` | Button | Cue/Loop Call 1/2X | 
+| `0x02` | `(1<<1)` | Button | Cue/Loop Call 2X | 
+| *`0x03`* | `(1<<7)` |  Button  | In/Cue | (part of the loop control section)
+| `0x03` | `(1<<6)` | Button | Out | 
+| `0x03` | `(1<<5)` | Button | Reloop/Exit | 
+| `0x03` | `(1<<2)` | Button | Time Mode / Auto Cue | 
+| `0x03` | `(1<<1)` | Button | Memory | 
+| `0x03` | `(1<<0)` | Button | Delete | 
+| *`0x04`* | `(1<<7)` |  Button  | Jog Mode | 
+| `0x04` | `(0b11<<5)` | Enum | Jogwheel Spinning direction | 
+* `0b11` Forward
+* `0b10` Backward
+* `0b01` Stationary
+* `0b00` Stationary (not clear what the difference to `0b
+()01` is)
+| `0x04` | `(1<<4)` | Button | Platter Touch | 
+| `0x04` | `(1<<3)` | Button | Tempo | 
+| `0x04` | `(1<<2)` | Button | Master Tempo | 
+| `0x04` | `(1<<1)` | Button | Tempo Reset | 
+| `0x04` | `(1<<0)` | Button | Needle Search Touched | Only contains whether it is touched, not the position of the touch.
+| *`0x05`* | `(1<<7)` |  Boolean  | Library/info view visibility | Indicates whether the library (Browse Button) or track info (Info Button) view is currently visible.
+(TODO: doublecheck whether this is actually true or the other way around and just indicates whether the Scrolling waveform view is visible)
+| `0x05` | `(1<<6)` | Button | Quantize | 
+| `0x05` | `(1<<5)` | Button | Master | 
+| `0x05` | `(1<<4)` | Button | Sync | 
+| `0x05` | `(1<<3)` | Button | Rotary encoder press | 
+| `0x05` | `(1<<2)` | Button | Back (near rotary encoder) | 
+| `0x05` | `(1<<1)` | Button | Tag Track / Remove (near rotary encoder) | 
+| `0x05` | `(1<<0)` | Button | Disk Eject press | 
+| *`0x06`* | `(1<<7)` |  Button  | Slip | 
+| `0x06` | `(1<<6)` |  Button  | Track direction (Latch Reverse) | set when Direction switch is flipped down
+| `0x06` | `(1<<5)` |  Button  | Track direction (Slip Reverse) | set when Direction switch is held up
+| `0x06` | `(1<<3)` | Button | Track Filter / Edit (near rotary encoder) | 
+| `0x06` | `(1<<2)` | Button | Call / Delete | Part of Hotcue Bank
+| *`0x07`* | `0xFF` |  TODO  | TODO | 
+| *`0x08`* | `(1<<7)` | Button | 32 Loop | Located in Loop Mode screen popover
+| `0x08` | `(1<<6)` | Button | 16 Loop | Located in Loop Mode screen popover
+| `0x08` | `(1<<5)` | Button | 8 Loop | Located in Loop Mode screen popover
+| `0x08` | `(1<<4)` | Button | 4 Loop | Located in Loop Mode screen popover 
+| `0x08` | `(1<<3)` | Button | 2 Loop | Located in Loop Mode screen popover
+| `0x08` | `(1<<2)` | Button | 1 Loop | Located in Loop Mode screen popover
+| *`0x09`* | `(1<<4)` | Button | 1/4 Loop | Located in Loop Mode screen popover 
+| `0x09` | `(1<<3)` | Button | 1/2 Loop | Located in Loop Mode screen popover 
+| `0x09` | `(1<<2)` | Button | 4/8 Beat | 
+| *`0x0D`* | `(1<<7)` | Button | 1 Beatjump Forwards | Located in Beat Jump screen popover
+| `0x0D` | `(1<<6)` | Button | 2 Beatjump Forwards | Located in Beat Jump screen popover
+| `0x0D` | `(1<<5)` | Button | 4 Beatjump Forwards | Located in Beat Jump screen popover
+| `0x0D` | `(1<<4)` | Button | 8 Beatjump Forwards | Located in Beat Jump screen popover
+| `0x0D` | `(1<<3)` | Button | 16 Beatjump Forwards | Located in Beat Jump screen popover
+| *`0x0E`* | `(1<<7)` | Button | 1 Beatjump Backwards | Located in Beat Jump screen popover
+| `0x0E` | `(1<<6)` | Button | 2 Beatjump backwards | Located in Beat Jump screen popover
+| `0x0E` | `(1<<5)` | Button | 4 Beatjump backwards | Located in Beat Jump screen popover
+| `0x0E` | `(1<<4)` | Button | 8 Beatjump backwards | Located in Beat Jump screen popover
+| `0x0E` | `(1<<3)` | Button | 16 Beatjump backwards | Located in Beat Jump screen popover
+| *`0x0F`* | `(1<<7)` | Button | Hotcue A |
+| `0x0F` | `(1<<6)` | Button | Hotcue B |
+| `0x0F` | `(1<<5)` | Button | Hotcue C |
+| `0x0F` | `(1<<4)` | Button | Hotcue D |
+| `0x0F` | `(1<<3)` | Button | Hotcue E |
+| `0x0F` | `(1<<2)` | Button | Hotcue F |
+| `0x0F` | `(1<<1)` | Button | Hotcue G |
+| `0x0F` | `(1<<0)` | Button | Hotcue H |
+| *`0x11`* | `0xFF` | Pot | Vinyl Speed Adjust Touch/Brake | Min-Max mapped to 0x00-0xFF
+| *`0x12`* | `0xFF` | Pot | Vinyl Speed Adjust Release/Start | Min-Max mapped to 0x00-0xFF
+| *`0x13--0x14`* | `0xFFFF` | Pot | Rotary Encoder | Position given as absolute _ushort_ LE even though the control is technically an infinite Encoder.
+| *`0x15--0x16`* | `0xFFFF` | Pot | Tempo Slider | Min-Max mapped to 1000 in both directions (_ushort_ LE)
+| *`0x17--0x18`* | `0xFFFF` | Pot | Jogwheel Position | Not sure why this is a feature of the protocol. Each turn contains approximately 9728 steps (encoded as _ushort_ LE)
+| *`0x19--0x1A`* | `0xFFFF` | Encoder | Jogwheel Speed | Only contains the absolute speed of the jogwheel. Direction has to be taken from the Enum in `0x04 & (0b11<<5)`.
+| *`0x1B--0x1C`* | `0xFFFF` | Pot | Needle search position | Maps start of track to beginning on track from 0 to 599. (_ushort_ LE)
+
+|===
+
+NOTE: the Jog Adjust Control as well as presses of the Shortcut Button do 
+not get reported by the CDJ.
+
+== Host->CDJ
+
+It has been observed that Rekordbox sends these control packets roughly every
+10ms but larger intervals should also work. However, that would affect output
+latency and the display quality of "high resolution sections" such as the Time 
+Elapsed/Remaining and LCD of the Jog Wheel.
+
+.Types
+SC-LED:: Single Color LED
+Enum:: See the attached List of Key-Value pairs (Keys being Integers)
+Boolean:: Similar to *SC-LED* but causes a change on the Display instead of changing an LED
+Struct:: Multiple bytes representing a single compound type
+Byte:: Single Byte usually representing Integer value
+uShortLE:: 16-bit unsigned Integer serialized in little-endian byte-order. Generally controls some onscreen element
+
+.Host to CDJ message offsets
+[options="header",cols="1,1,1,1,2a"]
+|===
+| Bytes  |   Mask   | Type | Control | Notes
+| *`0x00`* |  `0xFF`  |  --  |   --    | First Byte of is always `0x00`
+| *`0x01`* |  `0xFF`  |  --  | `0x21`  | Message Type `0x21`
+| *`0x02`* | `(1<<7)` | SC-LED | Play | 
+| `0x02` | `(1<<6)` | SC-LED | Cue | 
+| `0x02` | `(0b11)` | Enum | Cursor Color | 
+* `0b11` TODO
+* `0b10` Cursor Red
+* `0b01` Cursor Red
+* `0b00` Cursor White
+| *`0x03`* | `(1<<7)` | SC-LED | In/Cue | 
+| `0x03` | `(1<<6)` | SC-LED | Out | 
+| `0x03` | `(1<<5)` | SC-LED | Reloop/Exit | 
+| `0x03` | `(1<<3)` | Boolean | Time mode | display elapsed time if bit is set, otherwise display remaining time.
+| `0x03` | `(1<<2)` | Boolean | Auto Cue | 
+| `0x03` | `(1<<0)` | SC-LED | Rotary Ring |
+| *`0x04`* | `0xF0` | Enum | Tempo Range slot |
+* `0b0000` TODO
+* `0b0001` ±6%
+* `0b0010` ±10%
+* `0b0011` ±16%
+* `0b0100` WIDE (0BPM-256BPM) (also lowers displayed delta tempo precision)
+| `0x04` | `(1<<3)` | SC-LED | Tempo Reset |
+| `0x04` | `(1<<2)` | SC-LED | Master Tempo Button | also known as key-lock to not confuse it with Tempo/BPM/Sync Master 
+| `0x04` | `(1<<1)` | SC-LED | Jogwheel Outside Ring LED (white) |
+| `0x04` | `(1<<0)` | SC-LED | Jogwheel Outside Ring LED (red) |
+| *`0x05`* | `(1<<7)` | SC-LED & Boolean | Master | Also influences border of the BPM display in addition to the Master Button
+| `0x05` | `(1<<6)` | SC-LED | Sync |
+| `0x05` | `(0b11<<4)` | Enum | Sync Display |
+* `0b11` TODO
+* `0b10` Grey out tempo delta display and display sync icon
+* `0b01` Grey out tempo delta display and display inverted sync icon
+* `0b00` Enable Tempo delta display
+| `0x05` | `(1<<3)` | SC-LED | Slip |
+| `0x05` | `(1<<2)` | SC-LED | Reverse |
+| `0x05` | `(0b11<<0)` | Enum | Jog Mode |
+* `0b11` Same as `0b10`
+* `0b10` Turn off Vinyl/CDJ Leds
+* `0b01` Turn on Vinyl Mode LED and Vinyl indicator on Jog wheel screen 
+* `0b00` Turn on CDJ Mode LED
+| *`0x06`* | `0xE0` | Enum | Quantize Resolution |
+* `0b111` Invalid (disables element on display)
+* `0b110` Invalid (disables element on display)
+* `0b101` 1/16 beat
+* `0b100` 1/8 Beat
+* `0b011` 1/4 Beat
+* `0b010` 1/2 Beat
+* `0b001` 1 Beat
+* `0b000` TODO (IIRC this hides the display)
+| `0x06` | `(1<<4)` | Boolean | Quantize Screen Color | if bit is set, element will be displayed in red, otherwise grey
+| `0x06` | `(1<<3)` | SC-LED | Quantize | 
+| `0x06` | `(1<<0)` | Boolean | Enable blue phase meter? | TODO
+| *`0x07`* | `0xFF` | TODO | TODO |
+| *`0x08`* | `0xFF` | TODO | TODO |
+| *`0x09`* | `(1<<7)` | Boolean | Jogwheel display | if bit set, jogwheel display is enabled, if not set, jogwheel display will display plain white ring.
+| `0x09` | `(1<<6)` | Boolean | Continue Mode | Enables Track number display and changes text from "single" to "continue"
+| `0x09` | `(1<<5)` | Boolean | BPM Display visible | 
+| `0x09` | `(1<<1)` | Boolean | Disable Tempo Delta | Exact Purpose is unknown, also changes "Tempo" to "Bpm"
+| *`0x0A`* | `(1<<7)` | Boolean | Loop size Display Color enable | if bit is set, loop size display is greyed out (indicating it is disabled)
+| `0x0A` | `(0b11111)` | Enum | Current Loop Size | 
+* `0b00000` disable display
+* `0b00001` -- orange
+* `0b00010` <- orange
+* `0b00011` 1/128 orange
+* `0b00100` 1/64 orange
+* `0b00101` 1/32 orange
+* `0b00110` 1/16 orange
+* `0b00111` 1/8 orange
+* `0b01000` 1/4 orange
+* `0b01001` 1/3 white
+* `0b01010` 1/2 orange
+* `0b01011` 3/4 white
+* `0b01100` 1 orange
+* `0b01101` 2 orange
+* `0b01110` 4 orange
+* `0b01111` 8 orange
+* `0b10000` 16 orange
+* `0b10001` 32 orange
+* `0b10010` 64 orange
+* `0b10011` 128 orange
+* `0b10100` 256 orange
+* `0b10101` 512 orange
+* `0b10110` -> orange
+* `0b10111` -- `0b11111` invalid (disable display)
+| *`0x0B--0x0E`* | `0xFFFFFFFF` | Struct | Elapsed time of track | See time-struct
+| *`0x0F--0x12`* | `0xFFFFFFFF` | Struct | Absolute Length of track | See time-struct
+| *`0x13--0x14`* | `0xFFFF` | TODO | TODO |
+| *`0x15`* | `0xFF` | Byte | Whole BPM | The whole (integer) part of the BPM displayed in the BPM field.
+| *`0x16`* | `0xF0` | Byte | Fractional BPM | single digit fractional part of the BPM displayed in the BPM field.
+| *`0x17--0x18`* | `0xFFFF` | uShortLE | Tempo Delta | Relative Tempo delta in comparison to track Tempo (given in percent) multiplied by 100 so it can be transported as integer
+| *`0x19--0x21`* |  | TODO | TODO |
+| *`0x22--0x25`* | `0xFFFFFFFF` | Struct | Elapsed time (Slip mode) | When Slip-mode is active, manipulations such as looping, scratching, etc cause a slip mode cursor to keep track of the position in the track so the software can jump back to that point once the DJ has stopped manipulating the track. This time-struct tells the CDJ the position of that cursor.
+| *`0x26--0x27`* | `0xFFFF` | uShortLE | same as `0x17--0x18`? | TODO: investigate further
+|===
+
+=== Time-Struct
+
+Whenever the CDJ has to transmit a relative amount of time, it serializes the
+time information into the following four bytes:
+
+[bytefield]
+----
+include::example$bitfield.edn[]
+
+(draw-box "minutes" {:span 8})
+(draw-box "seconds" {:span 8})
+(draw-box "milliseconds LSB" {:span 8})
+(draw-box "milliseconds MSB" {:span 8})
+----
+
+NOTE: judging from the traffic observed between the host and the CDJ, these
+fields are unsigned and thus, cannot contain unsigned values. However, this
+hypothesis has not been confirmed yet. TODO
+
+Minutes:: amount of minutes (integer)
+Seconds:: amount of seconds in current minutes (so only carries values from
+0 to 59)
+Millseconds (LSB/MSB):: amount of milliseconds in current second. (serialized
+as ushort LE)
+
+Serializing time in this way limits the maximum track length a CDJ can deal with
+via HID to roughly 4 hours and 20 minutes.
+
+== TLDR
+
+The previous sections can't really be shortened. However, for the sake of 
+visualizing the packets, I will provide to bytefield-diagrams illustrating
+the offsets of compound fields and unknown bits. Each cell contains a bitmask
+expressed in hexadecimal to identify the bits whose functionality has not been
+discovered yet.
+
+.Control Input
 [bytefield]
 ----
 include::example$common_header.edn[]
 
+;; doesnt work TODO
+(defattrs :txt-red {:color "#C00000"})
+(defn draw-unknown-bits
+([bits] (draw-box bits :txt-red)))
+
+(draw-packet-header 0x20)
+(draw-box 0x01) ; 0x02
+(draw-box 2r110000) ; 0x03
+(draw-box 0x00) ; 0x04
+(draw-box 0x00) ; 0x05
+(draw-box 0x13 :txt-red) ; 0x06
+(draw-box 0xFF) ; 0x07
+(draw-box 0x03) ; 0x08
+(draw-box 0xE3) ; 0x09
+(draw-boxes (repeat 3 0xFF)) ; 0x0A,0x0B,0x0C
+(draw-box 2r111) ; 0x0D
+(draw-box 2r111) ; 0x0E
+(draw-box 0x00) ; 0x0F
+(draw-box 0xFF) ; 0x10
+(draw-box 0x00) ; 0x11
+(draw-box 0x00) ; 0x12
+(draw-box "Rot-Enc" {:span 2}) ; 0x13,0x14
+(draw-box "Tempo" {:span 2}) ; 0x15,0x16
+(draw-box "Jog Pos" {:span 2}) ; 0x17,0x18
+(draw-box "Jog Spd" {:span 2}) ; 0x19,0x1A
+(draw-box "Needle" {:span 2}) ; 0x1B,0x1C
+(draw-padding 0x40)
+----
+
+
+.Control Output
+[bytefield]
+----
+include::example$common_header.edn[]
+
+;; doesnt work TODO
+(defattrs :txt-red {:color "#C00000"})
+(defn draw-unknown-bits
+([bits] (draw-box bits :txt-red)))
 
 (draw-packet-header 0x21)
-
-(draw-box nil [{:span 14} :box-above])
-(draw-box "Controller control data" [ :box-related {:span 16}])
-(draw-box nil [:box-related {:span 16}])
-(draw-box nil [{:span 16} :box-below])
-
+(draw-box 2r110000) ; 0x02
+(draw-box 0x12) ; 0x03
+(draw-box 0x00) ; 0x04
+(draw-box 0x00) ; 0x05
+(draw-box 0x06) ; 0x06
+(draw-box 0xFF) ; 0x07
+(draw-box 0xFF) ; 0x08
+(draw-box 0x1D) ; 0x09
+(draw-box 0x60) ; 0x0A
+(draw-box "Elapsed Time" {:span 4}) ; 0x0B-0x0E
+(draw-box "" :box-first) ; 0x0F-0x12
+(draw-box "len of track" [:box-last {:span 3}]) ; 0x0F-0x12
+(draw-boxes [0xFF,0xFF]) ; 0x13-0x14
+(draw-box "BPM" {:span 2}) ; 0x15-0x16
+(draw-box "ΔTempo" {:span 2}) ; 0x17-0x18
+(draw-boxes (repeat 9 0xFF)) ; 0x19-0x21
+(draw-box "Elapsed Time (Slip)" {:span 4}) ; 0x22-0x25
+(draw-box "Todo" {:span 2}) ; 0x26-0x27
+(draw-padding 0x40)
 ----
-
-This type of packet seems to pack data very compact and encodes data
-even into single bits
-
-[cols="1,1a,1",options="header"]
-|===
-| Offset | Bitmask | Control
-
-| `0x03`
-|[bytefield]
-----
-include::example$bitfield.edn[]
-
-(draw-related-boxes (number-as-bits 2r10000000 8))
-----
-| Play LED
-
-| `0x04`
-|[bytefield]
-----
-include::example$bitfield.edn[]
-
-(draw-related-boxes (number-as-bits 2r10000000 8))
-----
-| Cue LED
-
-| `0x0d`
-|[bytefield]
-----
-include::example$bitfield.edn[]
-
-(draw-related-boxes (number-as-bits 2r11111111 8))
-----
-|needle position between the two currently adjacent beats. `0x00` being at the previous beat and `0xff` being at the next beat.
-
-| `0x0e`
-|[bytefield]
-----
-include::example$bitfield.edn[]
-
-(draw-related-boxes (number-as-bits 2r11111111 8))
-----
-| number of the previous beat in the current bar (1-based)
-
-|===
