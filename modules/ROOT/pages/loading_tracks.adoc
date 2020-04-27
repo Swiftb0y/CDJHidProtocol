@@ -73,7 +73,7 @@ include::example$fragmented_string_packet.edn[]
 ----
 include::example$common_header.edn[]
 
-(draw-packet-header 0x41)
+(draw-packet-header 0 0x41)
 (draw-box "Key"{:span 5})
 (draw-padding 0x40)
 ----

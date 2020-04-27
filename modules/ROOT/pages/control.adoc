@@ -276,7 +276,7 @@ include::example$common_header.edn[]
 (defn draw-unknown-bits
 ([bits] (draw-box bits :txt-red)))
 
-(draw-packet-header 0x20)
+(draw-packet-header 0 0x20)
 (draw-box 0x01) ; 0x02
 (draw-box 2r110000) ; 0x03
 (draw-box 0x00) ; 0x04
@@ -311,7 +311,7 @@ include::example$common_header.edn[]
 (defn draw-unknown-bits
 ([bits] (draw-box bits :txt-red)))
 
-(draw-packet-header 0x21)
+(draw-packet-header 0 0x21)
 (draw-box 2r110000) ; 0x02
 (draw-box 0x12) ; 0x03
 (draw-box 0x00) ; 0x04

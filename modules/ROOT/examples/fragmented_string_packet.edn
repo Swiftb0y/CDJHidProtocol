@@ -3,6 +3,6 @@
 (defn draw-string-packet
   "prints a fragmented string packet"
   [type string]
-  ((draw-packet-header type "I" "L")
+  ((draw-packet-header 0 type "I" "L")
    (draw-gap string)
    (draw-bottom)))

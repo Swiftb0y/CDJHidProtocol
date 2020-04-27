@@ -20,13 +20,16 @@ Every Packet being sent and received to and from the CDJs shares this common hea
 ----
 include::example$common_header.edn[]
 
-(draw-packet-header "type")
+(draw-packet-header "deck" "type")
 (draw-box nil [{:span 14} :box-above])
-(draw-box nil [:box-related {:span 16}])
-(draw-box (text "Packet rest according to type (padded with " :plain [:hex "00"] ")") [ :box-related {:span 16}])
+(draw-box nil [:box-above-related {:span 16}])
+(draw-box (text "Packet rest according to type (padded with " :plain [:hex "00"] ")") [ :box-above-related {:span 16}])
 (draw-box nil [{:span 16} :box-below])
 
 ----
+The first byte "deck" uses the more significant nibble to indicate the source/destination deck. It uses 0 for controllers which
+only have/represent a single deck such as a CDJ and 1-based deck numbers for controllers with multiple decks such as the
+XDJ-XZ. The "type" byte indicates the type of message being transmitted.
 This format limits the maximum amount of data transmitted to 62 Bytes which is not sufficient for
 transmitting larger strings or other binary data such as images. For these purposes, the protocol uses an extended header
 
@@ -38,10 +41,10 @@ data.
 ----
 include::example$common_fragmented_header.edn[]
 
-(draw-packet-header "type" "I" "L")
+(draw-packet-header "deck" "type" "I" "L")
 (draw-box nil [{:span 10} :box-above])
-(draw-box nil [:box-related {:span 16}])
-(draw-box (text "Packet rest according to type (padded with " :plain [:hex "00"] ")") [ :box-related {:span 16}])
+(draw-box nil [:box-above-related {:span 16}])
+(draw-box (text "Packet rest according to type (padded with " :plain [:hex "00"] ")") [ :box-above-related {:span 16}])
 (draw-box nil [{:span 16} :box-below])
 ----
 
@@ -49,10 +52,6 @@ include::example$common_fragmented_header.edn[]
 takes up while `I` indicates the index of the packet fragment in the current stream.
 Both _ushorts_ encoded in little-endian byte order.
 
-
-.Currently known values for `type`
-* `0xf0`: Used in Handshake procedure of host and CDJ
-* `0x25`: Set on-screen BPM
 
 === TLV Structure
 

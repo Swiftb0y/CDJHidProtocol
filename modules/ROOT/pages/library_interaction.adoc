@@ -128,7 +128,7 @@ to break up the buffer)
 include::example$common_fragmented_header.edn[]
 include::example$row_struct.edn[]
 
-(draw-packet-header 0x2a "I" "L")
+(draw-packet-header 0 0x2a "I" "L")
 
 (doseq [n (range 9)]
   (row-struct n "Icon" "C" #(draw-box "String" {:span 2})))
@@ -154,7 +154,7 @@ straightforward:
 include::example$common_fragmented_header.edn[]
 
 
-(draw-packet-header 0x2b "I" "L")
+(draw-packet-header 0 0x2b "I" "L")
 
 (draw-box "Length" {:span 2})
 (draw-gap "JPG Data")

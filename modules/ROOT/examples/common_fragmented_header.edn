@@ -9,9 +9,9 @@
 (defn draw-packet-header
   "Generates the byte labels and first two rows of a standard DJ Link
   startup packet with the specified `kind` byte."
-  [kind index length]
+  [deck kind index length]
   (draw-column-headers)
-  (draw-box 00 :box-first)
-  (draw-box kind [:bold :bg-green :box-last])
+  (draw-box deck)
+  (draw-box kind [:bold :bg-green])
   (draw-box index [{:span 2} :bg-blue])
   (draw-box length [{:span 2} :bg-blue]))

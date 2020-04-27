@@ -9,7 +9,7 @@
     "asciidoctor-mathjax": "0.0.5"
   },
   "scripts": {
-    "build": "npx antora --fetch ./playbook.yml"
+    "build": "npx antora ./playbook.yml"
   },
   "keywords": [
     "pioneer",
