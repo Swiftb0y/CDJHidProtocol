@@ -77,6 +77,7 @@ https://deepsymmetry.org/[Deep Symmetry] for not only creating
 https://github.com/Deep-Symmetry/bytefield-svg[bytefield-svg] which allowed 
 me to create these awesome bytefield diagrams but also for all of 
 https://djl-analysis.deepsymmetry.org/[his previous research] into the ProDJLink
-Protocol as well as helping me in the setup of this wiki and using bytefield-svg.
+Protocol as well as helping me in the setup of this wiki, using bytefield-svg
+and supplying me with some USB-Captures of the XDJ-XZ.
 Also thanks to mailto:ard@kwaak.net/[Ard van Breemen] for helping out with his 
 in-depth knowledge of the USB protocol.
