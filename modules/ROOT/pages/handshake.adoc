@@ -310,7 +310,8 @@ https://github.com/Swiftb0y/CDJHidProtocol/[this projects github repository]
 | *DJM250MK2*   | `0xD2F58B612C6206819139` | --                       | --                       | -- | -- | -- | -- | -- 
 | *DJM750MK2*   | `0x866E33BD04852E71ED21` | --                       | --                       | -- | -- | -- | -- | --
 | *DJMV10*      | `0x3C83DB259C76FE8DB2AB` | `0x1D3EAC55C613D297623D` | --                       | -- | -- | -- | -- | --
-| *XDJXZ*       | --                       | `0x2D99858D0A5A913D4EBD` | --                       | -- | -- | -- | -- | --
+| *XDJXZ*       | Not supported            | `0x2D99858D0A5A913D4EBD` | 
+Captures lead me to believe that there actually is no handshake taking place in this configuration| -- | -- | -- | -- | --
 |===
 
 NOTE: From my experiments, it looks like Atomix VirtualDJ actually poses
