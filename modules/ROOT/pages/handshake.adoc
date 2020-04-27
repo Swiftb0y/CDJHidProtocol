@@ -277,7 +277,7 @@ def hash(buff: bytes) -> int:
 === Validating the CDJs response
 
 The CDJs response can be validated by simply calculating appending the common
-secret and `SeedE` to each other and hashing that: `hashAd = hash(seedA+secret)`
+secret and `SeedA` to each other and hashing that: `hashAd = hash(seedA+secret)`
 
 If `hashAd` matches `hashA`, the CDJs response is valid.
 
