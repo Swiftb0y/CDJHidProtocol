@@ -101,13 +101,17 @@ include::example$common_fragmented_header.edn[]
 (draw-packet-header 0 0xf0 1 1)
 (tlv-struct
   (hex-text 0x11 2 :bold)
-  4
-  #(draw-related-boxes [0x01 0x04 0x01 0x55]))
+  4)
+(tlv-struct
+  1 4 #(draw-related-boxes ["Maj", "Min"]))
 
 (draw-padding 0x40)
 ----
 
-The meaning of the values at offset `0x08` to `0x0b` is unknown.
+The CDJ initiates the connection by sending a super tlv of type `0x11`
+and a single nested tlv of type `0x01` which contain the major and minor
+version of the CDJs firmware. At the time of writing, the newest
+version is `1.85`.
 
 At this point the host has to respond with the following message:
 
