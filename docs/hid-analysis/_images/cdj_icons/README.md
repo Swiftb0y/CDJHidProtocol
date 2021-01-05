@@ -1,1 +1,0 @@
-These images have been extracted from the user manual of the CDJ-2000NXS2 which can be found on pioneerDJs official website: https://www.pioneerdj.com/en/support/documents/player/cdj-2000nxs2/
