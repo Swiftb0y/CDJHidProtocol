@@ -266,16 +266,19 @@ transmission):
 
 === Hashing
 
-The engineers implemented their own one-way hash function which is not very
-complicated. Here is a complete reference implementation in python3.8:
+The CDJ uses a Fowler-Noll-Vo hash function (FNV-1a). 
+The value `0x811c9dc5` is used as the algorithms 32-bit `FNV offset basis` 
+while `0x1000193` serves as its `FNV Prime`.
+You can read more about https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function[FNV hashes on wikipedia]
+Here is a complete reference implementation in python3.8:
 
 [source, python3]
 ----
-def hash(buff: bytes) -> int:
-  mask = 0x811c9dc5
+def FNV(buff: bytes) -> int:
+  hash = 0x811c9dc5
   for val in buff:
-    mask = ((val^mask) * 0x1000193) & 0xFFFFFFFF
-  return mask
+    hash = ((val^hash) * 0x1000193) & 0xFFFFFFFF
+  return hash
 ----
 
 === Validating the CDJs response
