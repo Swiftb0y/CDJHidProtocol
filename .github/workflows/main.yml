@@ -3,7 +3,10 @@
 name: Build Doc
 
 # Controls when the action will run. 
-on: [ push ]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
