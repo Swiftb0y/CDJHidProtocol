@@ -439,16 +439,19 @@ transmission):</p>
 <div class="sect2">
 <h3 id="_hashing"><a class="anchor" href="#_hashing"></a>Hashing</h3>
 <div class="paragraph">
-<p>The engineers implemented their own one-way hash function which is not very
-complicated. Here is a complete reference implementation in python3.8:</p>
+<p>The CDJ uses a Fowler-Noll-Vo hash function (FNV-1a).
+The value <code>0x811c9dc5</code> is used as the algorithms 32-bit <code>FNV offset basis</code>
+while <code>0x1000193</code> serves as its <code>FNV Prime</code>.
+You can read more about <a href="https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function">FNV hashes on wikipedia</a>
+Here is a complete reference implementation in python3.8:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python3 hljs" data-lang="python3">def hash(buff: bytes) -&gt; int:
-  mask = 0x811c9dc5
+<pre class="highlightjs highlight"><code class="language-python3 hljs" data-lang="python3">def FNV(buff: bytes) -&gt; int:
+  hash = 0x811c9dc5
   for val in buff:
-    mask = ((val^mask) * 0x1000193) &amp; 0xFFFFFFFF
-  return mask</code></pre>
+    hash = ((val^hash) * 0x1000193) &amp; 0xFFFFFFFF
+  return hash</code></pre>
 </div>
 </div>
 </div>
