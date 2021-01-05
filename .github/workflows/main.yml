@@ -9,5 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate Antora Site
-        uses: jsqu4re/antora_build@0.1.1
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.4
+      - name: install dependencies
+        run: npm install
+      - name: build site
+        run: npx antora site.yml
