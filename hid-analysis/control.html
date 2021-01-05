@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Library interaction :: Pioneer CDJ HID Analysis</title>
+    <link rel="canonical" href="https://mixb.me/CDJHidProtocol/hid-analysis/control.html">
+    <meta name="generator" content="Antora 2.3.4">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <script>var uiRootPath = '../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://mixb.me/CDJHidProtocol">Pioneer CDJ HID Analysis</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="hid-analysis" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="startup.html">CDJ HID Packet Analysis</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="startup.html">CDJ HID Protocol</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="handshake.html">CDJ Handshake</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="control.html">CDJ Control</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="library_interaction.html">CDJ Library Interaction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="loading_tracks.html">Loading tracks on the CDJ</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">CDJ HID Packet Analysis</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="startup.html">CDJ HID Packet Analysis</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="startup.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="startup.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="startup.html">CDJ HID Packet Analysis</a></li>
+    <li><a href="control.html">CDJ Control</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/Swiftb0y/CDJHidProtocol/edit/build-doc-gh-actions/modules/ROOT/pages/control.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Library interaction</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_cdjhost">CDJ&#8594;Host</a></li>
+<li><a href="#_hostcdj">Host&#8594;CDJ</a>
+<ul class="sectlevel2">
+<li><a href="#_time_struct">Time-Struct</a></li>
+</ul>
+</li>
+<li><a href="#_tldr">TLDR</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This Page contains contains documentation for the simple IO protocol used to
+control the LEDs on the CDJ or detecting whether the user
+interacted with a physical control (such as buttons, knobs, etc).</p>
+</div>
+<div class="paragraph">
+<p>Communication in both directions uses a simple header with types <code>0x20</code> (input)
+or <code>0x21</code> (output).
+Both packets contain a single structure with fixed offsets (similar to
+the structure of packets exchanged by simpler HID controllers). Since the
+information is very tightly packed, a bytefield diagram is not able to describe
+the structure in enough detail, thus it will be described in table form. This
+table has a Column <code>Bytes</code> which identifies the position of the Byte or Bytes
+in question from the very start of the message. Moreover, the Column <code>Mask</code>
+contains a Mask (or an expression evaluating to mask) to be applied to the
+current Byte(s) to identify the exact
+Bit(s) in question. <code>Control</code> will hold the label of the control seen on the CDJ
+or an otherwise descriptive name in case the label isn&#8217;t present, while
+<code>Notes</code> will contain further explanation on the current Control
+in case that&#8217;s required. <code>Type</code> indicates the physical type of control.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cdjhost"><a class="anchor" href="#_cdjhost"></a>CDJ&#8594;Host</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Host seems to poll control messages from the host roughly every 100ms
+(TODO: seems low, need verification).
+When the <code>Type</code> describes a button, the bit being set means that the Button
+is currently being pressed while an unset bit indicates the opposite.
+All bytes that express values within a range are generally mapped linearly
+to their physical control.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. CDJ to Host message offsets</caption>
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 33.3336%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Bytes</th>
+<th class="tableblock halign-left valign-top">Mask</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Control</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x00</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>First Byte of is always <code>0x00</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x01</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x20</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Message Type <code>0x20</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x02</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Play/Pause</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cue</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Search forward</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Search backward</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Track Search forward</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cue/Loop Call 1/2X</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cue/Loop Call 2X</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x03</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">In/Cue</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>(part of the loop control section)</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Out</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reloop/Exit</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time Mode / Auto Cue</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Memory</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delete</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x04</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jog Mode</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(0b11&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jogwheel Spinning direction</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p><code>0b11</code> Forward</p>
+</li>
+<li>
+<p><code>0b10</code> Backward</p>
+</li>
+<li>
+<p><code>0b01</code> Stationary</p>
+</li>
+<li>
+<p><code>0b00</code> Stationary (not clear what the difference to <code>0b
+()01</code> is)</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Platter Touch</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Master Tempo</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo Reset</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Needle Search Touched</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Only contains whether it is touched, not the position of the touch.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x05</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Library/info view visibility</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Indicates whether the library (Browse Button) or track info (Info Button) view is currently visible.
+(TODO: doublecheck whether this is actually true or the other way around and just indicates whether the Scrolling waveform view is visible)</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quantize</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Master</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sync</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rotary encoder press</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Back (near rotary encoder)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tag Track / Remove (near rotary encoder)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Disk Eject press</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x06</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Slip</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Track direction (Latch Reverse)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>set when Direction switch is flipped down</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Track direction (Slip Reverse)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>set when Direction switch is held up</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Track Filter / Edit (near rotary encoder)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Call / Delete</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Part of Hotcue Bank</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x07</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x08</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x08</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x08</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x08</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x08</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x08</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x09</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1/4 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x09</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1/2 Loop</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Loop Mode screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x09</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4/8 Beat</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x0D</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1 Beatjump Forwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0D</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2 Beatjump Forwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0D</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4 Beatjump Forwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0D</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8 Beatjump Forwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0D</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16 Beatjump Forwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x0E</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1 Beatjump Backwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0E</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2 Beatjump backwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0E</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4 Beatjump backwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0E</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8 Beatjump backwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0E</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16 Beatjump backwards</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Located in Beat Jump screen popover</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x0F</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue A</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue B</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue C</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue D</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue E</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue F</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue G</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0F</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Button</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hotcue H</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x11</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vinyl Speed Adjust Touch/Brake</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Min-Max mapped to 0x00-0xFF</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x12</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vinyl Speed Adjust Release/Start</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Min-Max mapped to 0x00-0xFF</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x13&#8212;&#8203;0x14</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rotary Encoder</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Position given as absolute <em>ushort</em> LE even though the control is technically an infinite Encoder.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x15&#8212;&#8203;0x16</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo Slider</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Min-Max mapped to 1000 in both directions (<em>ushort</em> LE)</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x17&#8212;&#8203;0x18</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jogwheel Position</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Not sure why this is a feature of the protocol. Each turn contains approximately 9728 steps (encoded as <em>ushort</em> LE)</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x19&#8212;&#8203;0x1A</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Encoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jogwheel Speed</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Only contains the absolute speed of the jogwheel. Direction has to be taken from the Enum in <code>0x04 &amp; (0b11&lt;&lt;5)</code>.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x1B&#8212;&#8203;0x1C</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Needle search position</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Maps start of track to beginning on track from 0 to 599. (<em>ushort</em> LE)</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+the Jog Adjust Control as well as presses of the Shortcut Button do
+not get reported by the CDJ.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hostcdj"><a class="anchor" href="#_hostcdj"></a>Host&#8594;CDJ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It has been observed that Rekordbox sends these control packets roughly every
+10ms but larger intervals should also work. However, that would affect output
+latency and the display quality of "high resolution sections" such as the Time
+Elapsed/Remaining and LCD of the Jog Wheel.</p>
+</div>
+<div class="dlist">
+<div class="title">Types</div>
+<dl>
+<dt class="hdlist1">SC-LED</dt>
+<dd>
+<p>Single Color LED</p>
+</dd>
+<dt class="hdlist1">Enum</dt>
+<dd>
+<p>See the attached List of Key-Value pairs (Keys being Integers)</p>
+</dd>
+<dt class="hdlist1">Boolean</dt>
+<dd>
+<p>Similar to <strong>SC-LED</strong> but causes a change on the Display instead of changing an LED</p>
+</dd>
+<dt class="hdlist1">Struct</dt>
+<dd>
+<p>Multiple bytes representing a single compound type</p>
+</dd>
+<dt class="hdlist1">Byte</dt>
+<dd>
+<p>Single Byte usually representing Integer value</p>
+</dd>
+<dt class="hdlist1">uShortLE</dt>
+<dd>
+<p>16-bit unsigned Integer serialized in little-endian byte-order. Generally controls some onscreen element</p>
+</dd>
+</dl>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Host to CDJ message offsets</caption>
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 33.3336%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Bytes</th>
+<th class="tableblock halign-left valign-top">Mask</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Control</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x00</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>First Byte of is always <code>0x00</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x01</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x21</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Message Type <code>0x21</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x02</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Play</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cue</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x02</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(0b11)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cursor Color</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p><code>0b11</code> TODO</p>
+</li>
+<li>
+<p><code>0b10</code> Cursor Red</p>
+</li>
+<li>
+<p><code>0b01</code> Cursor Red</p>
+</li>
+<li>
+<p><code>0b00</code> Cursor White</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x03</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">In/Cue</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Out</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reloop/Exit</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time mode</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>display elapsed time if bit is set, otherwise display remaining time.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Auto Cue</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x03</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rotary Ring</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x04</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xF0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo Range slot</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p><code>0b0000</code> TODO</p>
+</li>
+<li>
+<p><code>0b0001</code> ±6%</p>
+</li>
+<li>
+<p><code>0b0010</code> ±10%</p>
+</li>
+<li>
+<p><code>0b0011</code> ±16%</p>
+</li>
+<li>
+<p><code>0b0100</code> WIDE (0BPM-256BPM) (also lowers displayed delta tempo precision)</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo Reset</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Master Tempo Button</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>also known as key-lock to not confuse it with Tempo/BPM/Sync Master</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jogwheel Outside Ring LED (white)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x04</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jogwheel Outside Ring LED (red)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x05</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED &amp; Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Master</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Also influences border of the BPM display in addition to the Master Button</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sync</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(0b11&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sync Display</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p><code>0b11</code> TODO</p>
+</li>
+<li>
+<p><code>0b10</code> Grey out tempo delta display and display sync icon</p>
+</li>
+<li>
+<p><code>0b01</code> Grey out tempo delta display and display inverted sync icon</p>
+</li>
+<li>
+<p><code>0b00</code> Enable Tempo delta display</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Slip</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reverse</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x05</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(0b11&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jog Mode</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p><code>0b11</code> Same as <code>0b10</code></p>
+</li>
+<li>
+<p><code>0b10</code> Turn off Vinyl/CDJ Leds</p>
+</li>
+<li>
+<p><code>0b01</code> Turn on Vinyl Mode LED and Vinyl indicator on Jog wheel screen</p>
+</li>
+<li>
+<p><code>0b00</code> Turn on CDJ Mode LED</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x06</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xE0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quantize Resolution</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p><code>0b111</code> Invalid (disables element on display)</p>
+</li>
+<li>
+<p><code>0b110</code> Invalid (disables element on display)</p>
+</li>
+<li>
+<p><code>0b101</code> 1/16 beat</p>
+</li>
+<li>
+<p><code>0b100</code> 1/8 Beat</p>
+</li>
+<li>
+<p><code>0b011</code> 1/4 Beat</p>
+</li>
+<li>
+<p><code>0b010</code> 1/2 Beat</p>
+</li>
+<li>
+<p><code>0b001</code> 1 Beat</p>
+</li>
+<li>
+<p><code>0b000</code> TODO (IIRC this hides the display)</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;4)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quantize Screen Color</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>if bit is set, element will be displayed in red, otherwise grey</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SC-LED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quantize</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x06</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;0)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable blue phase meter?</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>TODO</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x07</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x08</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x09</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jogwheel display</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>if bit set, jogwheel display is enabled, if not set, jogwheel display will display plain white ring.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x09</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;6)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Continue Mode</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Enables Track number display and changes text from "single" to "continue"</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x09</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BPM Display visible</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x09</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Disable Tempo Delta</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Exact Purpose is unknown, also changes "Tempo" to "Bpm"</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x0A</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(1&lt;&lt;7)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Loop size Display Color enable</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>if bit is set, loop size display is greyed out (indicating it is disabled)</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x0A</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(0b11111)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current Loop Size</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p><code>0b00000</code> disable display</p>
+</li>
+<li>
+<p><code>0b00001</code>&#8201;&#8212;&#8201;orange</p>
+</li>
+<li>
+<p><code>0b00010</code> &#8592; orange</p>
+</li>
+<li>
+<p><code>0b00011</code> 1/128 orange</p>
+</li>
+<li>
+<p><code>0b00100</code> 1/64 orange</p>
+</li>
+<li>
+<p><code>0b00101</code> 1/32 orange</p>
+</li>
+<li>
+<p><code>0b00110</code> 1/16 orange</p>
+</li>
+<li>
+<p><code>0b00111</code> 1/8 orange</p>
+</li>
+<li>
+<p><code>0b01000</code> 1/4 orange</p>
+</li>
+<li>
+<p><code>0b01001</code> 1/3 white</p>
+</li>
+<li>
+<p><code>0b01010</code> 1/2 orange</p>
+</li>
+<li>
+<p><code>0b01011</code> 3/4 white</p>
+</li>
+<li>
+<p><code>0b01100</code> 1 orange</p>
+</li>
+<li>
+<p><code>0b01101</code> 2 orange</p>
+</li>
+<li>
+<p><code>0b01110</code> 4 orange</p>
+</li>
+<li>
+<p><code>0b01111</code> 8 orange</p>
+</li>
+<li>
+<p><code>0b10000</code> 16 orange</p>
+</li>
+<li>
+<p><code>0b10001</code> 32 orange</p>
+</li>
+<li>
+<p><code>0b10010</code> 64 orange</p>
+</li>
+<li>
+<p><code>0b10011</code> 128 orange</p>
+</li>
+<li>
+<p><code>0b10100</code> 256 orange</p>
+</li>
+<li>
+<p><code>0b10101</code> 512 orange</p>
+</li>
+<li>
+<p><code>0b10110</code> &#8594; orange</p>
+</li>
+<li>
+<p><code>0b10111</code>&#8201;&#8212;&#8201;<code>0b11111</code> invalid (disable display)</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x0B&#8212;&#8203;0x0E</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFFFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Struct</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Elapsed time of track</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>See time-struct</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x0F&#8212;&#8203;0x12</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFFFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Struct</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Absolute Length of track</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>See time-struct</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x13&#8212;&#8203;0x14</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x15</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Byte</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whole BPM</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>The whole (integer) part of the BPM displayed in the BPM field.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x16</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xF0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Byte</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fractional BPM</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>single digit fractional part of the BPM displayed in the BPM field.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x17&#8212;&#8203;0x18</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">uShortLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo Delta</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Relative Tempo delta in comparison to track Tempo (given in percent) multiplied by 100 so it can be transported as integer</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x19&#8212;&#8203;0x21</code></strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x22&#8212;&#8203;0x25</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFFFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Struct</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Elapsed time (Slip mode)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>When Slip-mode is active, manipulations such as looping, scratching, etc cause a slip mode cursor to keep track of the position in the track so the software can jump back to that point once the DJ has stopped manipulating the track. This time-struct tells the CDJ the position of that cursor.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>0x26&#8212;&#8203;0x27</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xFFFF</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">uShortLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">same as <code>0x17&#8212;&#8203;0x18</code>?</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>TODO: investigate further</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_time_struct"><a class="anchor" href="#_time_struct"></a>Time-Struct</h3>
+<div class="paragraph">
+<p>Whenever the CDJ has to transmit a relative amount of time, it serializes the
+time information into the following four bytes:</p>
+</div>
+<div class="imageblock bytefield">
+<div class="content"><?xml version="1.0" encoding="UTF-8"?><svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="162" height="136" viewBox="0 0 162 136" ><text x="11" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >7</text><text x="31" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >6</text><text x="51" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >5</text><text x="71" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >4</text><text x="91" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >3</text><text x="111" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >2</text><text x="131" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >1</text><text x="151" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >0</text><line x1="1" y1="15" x2="161" y2="15" stroke="#000000" stroke-width="1" /><line x1="1" y1="45" x2="161" y2="45" stroke="#000000" stroke-width="1" /><line x1="161" y1="15" x2="161" y2="45" stroke="#000000" stroke-width="1" /><line x1="1" y1="15" x2="1" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="81" y="31" text-anchor="middle" dominant-baseline="middle" >minutes</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="-4" y="30" text-anchor="end" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="-4" y="60" text-anchor="end" >08</text><line x1="1" y1="45" x2="161" y2="45" stroke="#000000" stroke-width="1" /><line x1="1" y1="75" x2="161" y2="75" stroke="#000000" stroke-width="1" /><line x1="161" y1="45" x2="161" y2="75" stroke="#000000" stroke-width="1" /><line x1="1" y1="45" x2="1" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="81" y="61" text-anchor="middle" dominant-baseline="middle" >seconds</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="-4" y="90" text-anchor="end" >10</text><line x1="1" y1="75" x2="161" y2="75" stroke="#000000" stroke-width="1" /><line x1="1" y1="105" x2="161" y2="105" stroke="#000000" stroke-width="1" /><line x1="161" y1="75" x2="161" y2="105" stroke="#000000" stroke-width="1" /><line x1="1" y1="75" x2="1" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="81" y="91" text-anchor="middle" dominant-baseline="middle" >milliseconds LSB</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="-4" y="120" text-anchor="end" >18</text><line x1="1" y1="105" x2="161" y2="105" stroke="#000000" stroke-width="1" /><line x1="1" y1="135" x2="161" y2="135" stroke="#000000" stroke-width="1" /><line x1="161" y1="105" x2="161" y2="135" stroke="#000000" stroke-width="1" /><line x1="1" y1="105" x2="1" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="81" y="121" text-anchor="middle" dominant-baseline="middle" >milliseconds MSB</text></svg></div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+judging from the traffic observed between the host and the CDJ, these
+fields are unsigned and thus, cannot contain unsigned values. However, this
+hypothesis has not been confirmed yet. TODO
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Minutes</dt>
+<dd>
+<p>amount of minutes (integer)</p>
+</dd>
+<dt class="hdlist1">Seconds</dt>
+<dd>
+<p>amount of seconds in current minutes (so only carries values from
+0 to 59)</p>
+</dd>
+<dt class="hdlist1">Millseconds (LSB/MSB)</dt>
+<dd>
+<p>amount of milliseconds in current second. (serialized
+as ushort LE)</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Serializing time in this way limits the maximum track length a CDJ can deal with
+via HID to roughly 4 hours and 20 minutes.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tldr"><a class="anchor" href="#_tldr"></a>TLDR</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The previous sections can&#8217;t really be shortened. However, for the sake of
+visualizing the packets, I will provide to bytefield-diagrams illustrating
+the offsets of compound fields and unknown bits. Each cell contains a bitmask
+expressed in hexadecimal to identify the bits whose functionality has not been
+discovered yet.</p>
+</div>
+<div class="imageblock bytefield">
+<div class="content"><?xml version="1.0" encoding="UTF-8"?><svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="681" height="136" viewBox="0 0 681 136" ><text x="60" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >0</text><text x="100" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >1</text><text x="140" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >2</text><text x="180" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >3</text><text x="220" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >4</text><text x="260" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >5</text><text x="300" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >6</text><text x="340" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >7</text><text x="380" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >8</text><text x="420" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >9</text><text x="460" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >a</text><text x="500" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >b</text><text x="540" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >c</text><text x="580" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >d</text><text x="620" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >e</text><text x="660" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >f</text><line x1="40" y1="15" x2="80" y2="15" stroke="#000000" stroke-width="1" /><line x1="40" y1="45" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="40" y1="15" x2="40" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><rect x="80" y="15" height="30" width="40" fill="#a0ffa0" /><line x1="80" y1="15" x2="120" y2="15" stroke="#000000" stroke-width="1" /><line x1="80" y1="45" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="31" text-anchor="middle" dominant-baseline="middle" >20</text><line x1="120" y1="15" x2="160" y2="15" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="160" y1="15" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="31" text-anchor="middle" dominant-baseline="middle" >01</text><line x1="160" y1="15" x2="200" y2="15" stroke="#000000" stroke-width="1" /><line x1="160" y1="45" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="160" y1="15" x2="160" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="31" text-anchor="middle" dominant-baseline="middle" >30</text><line x1="200" y1="15" x2="240" y2="15" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line x1="240" y1="15" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="240" y1="15" x2="280" y2="15" stroke="#000000" stroke-width="1" /><line x1="240" y1="45" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="240" y1="15" x2="240" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="260" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="280" y1="15" x2="320" y2="15" stroke="#000000" stroke-width="1" /><line x1="280" y1="45" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="31" text-anchor="middle" dominant-baseline="middle" >13</text><line x1="320" y1="15" x2="360" y2="15" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="340" y="31" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="360" y1="15" x2="400" y2="15" stroke="#000000" stroke-width="1" /><line x1="360" y1="45" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="31" text-anchor="middle" dominant-baseline="middle" >03</text><line x1="400" y1="15" x2="440" y2="15" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="31" text-anchor="middle" dominant-baseline="middle" >e3</text><line x1="440" y1="15" x2="480" y2="15" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="480" y2="45" stroke="#000000" stroke-width="1" /><line x1="480" y1="15" x2="480" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="31" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="480" y1="15" x2="520" y2="15" stroke="#000000" stroke-width="1" /><line x1="480" y1="45" x2="520" y2="45" stroke="#000000" stroke-width="1" /><line x1="520" y1="15" x2="520" y2="45" stroke="#000000" stroke-width="1" /><line x1="480" y1="15" x2="480" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="500" y="31" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="520" y1="15" x2="560" y2="15" stroke="#000000" stroke-width="1" /><line x1="520" y1="45" x2="560" y2="45" stroke="#000000" stroke-width="1" /><line x1="560" y1="15" x2="560" y2="45" stroke="#000000" stroke-width="1" /><line x1="520" y1="15" x2="520" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="31" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="560" y1="15" x2="600" y2="15" stroke="#000000" stroke-width="1" /><line x1="560" y1="45" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="15" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line x1="560" y1="15" x2="560" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="31" text-anchor="middle" dominant-baseline="middle" >07</text><line x1="600" y1="15" x2="640" y2="15" stroke="#000000" stroke-width="1" /><line x1="600" y1="45" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line x1="640" y1="15" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="15" x2="600" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="31" text-anchor="middle" dominant-baseline="middle" >07</text><line x1="640" y1="15" x2="680" y2="15" stroke="#000000" stroke-width="1" /><line x1="640" y1="45" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line x1="680" y1="15" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line x1="640" y1="15" x2="640" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="30" text-anchor="end" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="60" text-anchor="end" >10</text><line x1="40" y1="45" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="40" y1="75" x2="80" y2="75" stroke="#000000" stroke-width="1" /><line x1="80" y1="45" x2="80" y2="75" stroke="#000000" stroke-width="1" /><line x1="40" y1="45" x2="40" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="80" y1="45" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="80" y1="75" x2="120" y2="75" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="120" y2="75" stroke="#000000" stroke-width="1" /><line x1="80" y1="45" x2="80" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="120" y1="45" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="75" x2="160" y2="75" stroke="#000000" stroke-width="1" /><line x1="160" y1="45" x2="160" y2="75" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="120" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="160" y1="45" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line x1="160" y1="75" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line x1="240" y1="45" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line x1="160" y1="45" x2="160" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="200" y="61" text-anchor="middle" dominant-baseline="middle" >Rot-Enc</text><line x1="240" y1="45" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="240" y1="75" x2="320" y2="75" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="320" y2="75" stroke="#000000" stroke-width="1" /><line x1="240" y1="45" x2="240" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="280" y="61" text-anchor="middle" dominant-baseline="middle" >Tempo</text><line x1="320" y1="45" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="320" y1="75" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="320" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="360" y="61" text-anchor="middle" dominant-baseline="middle" >Jog Pos</text><line x1="400" y1="45" x2="480" y2="45" stroke="#000000" stroke-width="1" /><line x1="400" y1="75" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line x1="480" y1="45" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="400" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="440" y="61" text-anchor="middle" dominant-baseline="middle" >Jog Spd</text><line x1="480" y1="45" x2="560" y2="45" stroke="#000000" stroke-width="1" /><line x1="480" y1="75" x2="560" y2="75" stroke="#000000" stroke-width="1" /><line x1="560" y1="45" x2="560" y2="75" stroke="#000000" stroke-width="1" /><line x1="480" y1="45" x2="480" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="520" y="61" text-anchor="middle" dominant-baseline="middle" >Needle</text><line x1="560" y1="45" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="75" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="45" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line x1="560" y1="45" x2="560" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="600" y1="45" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="75" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="45" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="45" x2="600" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="640" y1="45" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="75" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line x1="680" y1="45" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="45" x2="640" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="61" text-anchor="middle" dominant-baseline="middle" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="90" text-anchor="end" >20</text><line x1="40" y1="75" x2="80" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="40" y1="105" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="75" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line x1="40" y1="75" x2="40" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="80" y1="75" x2="120" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="105" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="120" y1="75" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="75" x2="80" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="120" y1="75" x2="160" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="120" y1="105" x2="160" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="75" x2="160" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="120" y1="75" x2="120" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="160" y1="75" x2="200" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="105" x2="200" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="75" x2="200" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="75" x2="160" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="200" y1="75" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="105" x2="240" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="75" x2="240" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="75" x2="200" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="240" y1="75" x2="280" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="105" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="280" y1="75" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="75" x2="240" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="260" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="280" y1="75" x2="320" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="280" y1="105" x2="320" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="75" x2="320" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="280" y1="75" x2="280" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="320" y1="75" x2="360" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="105" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="75" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="75" x2="320" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="340" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="360" y1="75" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="105" x2="400" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="75" x2="400" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="75" x2="360" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="400" y1="75" x2="440" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="75" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="75" x2="400" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="440" y1="75" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="105" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="75" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="75" x2="440" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="480" y1="75" x2="520" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="105" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="75" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="75" x2="480" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="500" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="520" y1="75" x2="560" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="105" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="75" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="75" x2="520" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="560" y1="75" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="75" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="75" x2="560" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="600" y1="75" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="640" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="75" x2="640" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="75" x2="600" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="640" y1="75" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line x1="680" y1="75" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="75" x2="640" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="120" text-anchor="end" >30</text><line stroke-dasharray="1,3" x1="40" y1="105" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line x1="40" y1="135" x2="80" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="105" x2="80" y2="135" stroke="#000000" stroke-width="1" /><line x1="40" y1="105" x2="40" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="80" y1="105" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line x1="80" y1="135" x2="120" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="120" y1="105" x2="120" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="105" x2="80" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="120" y1="105" x2="160" y2="105" stroke="#000000" stroke-width="1" /><line x1="120" y1="135" x2="160" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="105" x2="160" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="120" y1="105" x2="120" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="160" y1="105" x2="200" y2="105" stroke="#000000" stroke-width="1" /><line x1="160" y1="135" x2="200" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="105" x2="200" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="105" x2="160" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="200" y1="105" x2="240" y2="105" stroke="#000000" stroke-width="1" /><line x1="200" y1="135" x2="240" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="105" x2="240" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="105" x2="200" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="240" y1="105" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line x1="240" y1="135" x2="280" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="280" y1="105" x2="280" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="105" x2="240" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="260" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="280" y1="105" x2="320" y2="105" stroke="#000000" stroke-width="1" /><line x1="280" y1="135" x2="320" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="105" x2="320" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="280" y1="105" x2="280" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="320" y1="105" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line x1="320" y1="135" x2="360" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="105" x2="360" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="105" x2="320" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="340" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="360" y1="105" x2="400" y2="105" stroke="#000000" stroke-width="1" /><line x1="360" y1="135" x2="400" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="400" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="105" x2="360" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="400" y1="105" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line x1="400" y1="135" x2="440" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="105" x2="440" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="400" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="440" y1="105" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line x1="440" y1="135" x2="480" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="105" x2="480" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="105" x2="440" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="480" y1="105" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line x1="480" y1="135" x2="520" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="105" x2="520" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="105" x2="480" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="500" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="520" y1="105" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line x1="520" y1="135" x2="560" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="560" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="105" x2="520" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="560" y1="105" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line x1="560" y1="135" x2="600" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="600" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="560" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="600" y1="105" x2="640" y2="105" stroke="#000000" stroke-width="1" /><line x1="600" y1="135" x2="640" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="640" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="600" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="640" y1="105" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line x1="640" y1="135" x2="680" y2="135" stroke="#000000" stroke-width="1" /><line x1="680" y1="105" x2="680" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="640" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="121" text-anchor="middle" dominant-baseline="middle" >00</text></svg></div>
+<div class="title">Control Input</div>
+</div>
+<div class="imageblock bytefield">
+<div class="content"><?xml version="1.0" encoding="UTF-8"?><svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="681" height="136" viewBox="0 0 681 136" ><text x="60" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >0</text><text x="100" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >1</text><text x="140" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >2</text><text x="180" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >3</text><text x="220" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >4</text><text x="260" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >5</text><text x="300" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >6</text><text x="340" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >7</text><text x="380" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >8</text><text x="420" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >9</text><text x="460" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >a</text><text x="500" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >b</text><text x="540" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >c</text><text x="580" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >d</text><text x="620" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >e</text><text x="660" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >f</text><line x1="40" y1="15" x2="80" y2="15" stroke="#000000" stroke-width="1" /><line x1="40" y1="45" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="40" y1="15" x2="40" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><rect x="80" y="15" height="30" width="40" fill="#a0ffa0" /><line x1="80" y1="15" x2="120" y2="15" stroke="#000000" stroke-width="1" /><line x1="80" y1="45" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="31" text-anchor="middle" dominant-baseline="middle" >21</text><line x1="120" y1="15" x2="160" y2="15" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="160" y1="15" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="31" text-anchor="middle" dominant-baseline="middle" >30</text><line x1="160" y1="15" x2="200" y2="15" stroke="#000000" stroke-width="1" /><line x1="160" y1="45" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="160" y1="15" x2="160" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="31" text-anchor="middle" dominant-baseline="middle" >12</text><line x1="200" y1="15" x2="240" y2="15" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line x1="240" y1="15" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="240" y1="15" x2="280" y2="15" stroke="#000000" stroke-width="1" /><line x1="240" y1="45" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="240" y1="15" x2="240" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="260" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="280" y1="15" x2="320" y2="15" stroke="#000000" stroke-width="1" /><line x1="280" y1="45" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="31" text-anchor="middle" dominant-baseline="middle" >06</text><line x1="320" y1="15" x2="360" y2="15" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="340" y="31" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="360" y1="15" x2="400" y2="15" stroke="#000000" stroke-width="1" /><line x1="360" y1="45" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="31" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="400" y1="15" x2="440" y2="15" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="31" text-anchor="middle" dominant-baseline="middle" >1d</text><line x1="440" y1="15" x2="480" y2="15" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="480" y2="45" stroke="#000000" stroke-width="1" /><line x1="480" y1="15" x2="480" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="31" text-anchor="middle" dominant-baseline="middle" >60</text><line x1="480" y1="15" x2="640" y2="15" stroke="#000000" stroke-width="1" /><line x1="480" y1="45" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line x1="640" y1="15" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line x1="480" y1="15" x2="480" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="560" y="31" text-anchor="middle" dominant-baseline="middle" >Elapsed Time</text><line x1="640" y1="15" x2="680" y2="15" stroke="#000000" stroke-width="1" /><line x1="640" y1="45" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="680" y1="15" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line x1="640" y1="15" x2="640" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="660" y="31" text-anchor="middle" dominant-baseline="middle" ></text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="30" text-anchor="end" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="60" text-anchor="end" >10</text><line x1="40" y1="45" x2="160" y2="45" stroke="#000000" stroke-width="1" /><line x1="40" y1="75" x2="160" y2="75" stroke="#000000" stroke-width="1" /><line x1="160" y1="45" x2="160" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="40" y1="45" x2="40" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="100" y="61" text-anchor="middle" dominant-baseline="middle" >len of track</text><line x1="160" y1="45" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="160" y1="75" x2="200" y2="75" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="200" y2="75" stroke="#000000" stroke-width="1" /><line x1="160" y1="45" x2="160" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="200" y1="45" x2="240" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="75" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line x1="240" y1="45" x2="240" y2="75" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="200" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="240" y1="45" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="240" y1="75" x2="320" y2="75" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="320" y2="75" stroke="#000000" stroke-width="1" /><line x1="240" y1="45" x2="240" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="280" y="61" text-anchor="middle" dominant-baseline="middle" >BPM</text><line x1="320" y1="45" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="320" y1="75" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="320" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="360" y="61" text-anchor="middle" dominant-baseline="middle" >ΔTempo</text><line x1="400" y1="45" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="400" y1="75" x2="440" y2="75" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="440" y2="75" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="400" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="440" y1="45" x2="480" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="75" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line x1="480" y1="45" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="440" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="480" y1="45" x2="520" y2="45" stroke="#000000" stroke-width="1" /><line x1="480" y1="75" x2="520" y2="75" stroke="#000000" stroke-width="1" /><line x1="520" y1="45" x2="520" y2="75" stroke="#000000" stroke-width="1" /><line x1="480" y1="45" x2="480" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="500" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="520" y1="45" x2="560" y2="45" stroke="#000000" stroke-width="1" /><line x1="520" y1="75" x2="560" y2="75" stroke="#000000" stroke-width="1" /><line x1="560" y1="45" x2="560" y2="75" stroke="#000000" stroke-width="1" /><line x1="520" y1="45" x2="520" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="560" y1="45" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line x1="560" y1="75" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line x1="600" y1="45" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line x1="560" y1="45" x2="560" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="600" y1="45" x2="640" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="75" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line x1="640" y1="45" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line x1="600" y1="45" x2="600" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="640" y1="45" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line x1="640" y1="75" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line x1="680" y1="45" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line x1="640" y1="45" x2="640" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="61" text-anchor="middle" dominant-baseline="middle" >ff</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="90" text-anchor="end" >20</text><line x1="40" y1="75" x2="80" y2="75" stroke="#000000" stroke-width="1" /><line x1="40" y1="105" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line x1="80" y1="75" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line x1="40" y1="75" x2="40" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="91" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="80" y1="75" x2="120" y2="75" stroke="#000000" stroke-width="1" /><line x1="80" y1="105" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line x1="120" y1="75" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line x1="80" y1="75" x2="80" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="91" text-anchor="middle" dominant-baseline="middle" >ff</text><line x1="120" y1="75" x2="280" y2="75" stroke="#000000" stroke-width="1" /><line x1="120" y1="105" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line x1="280" y1="75" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line x1="120" y1="75" x2="120" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="200" y="91" text-anchor="middle" dominant-baseline="middle" >Elapsed Time (Slip)</text><line x1="280" y1="75" x2="360" y2="75" stroke="#000000" stroke-width="1" /><line x1="280" y1="105" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line x1="360" y1="75" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line x1="280" y1="75" x2="280" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="320" y="91" text-anchor="middle" dominant-baseline="middle" >Todo</text><line x1="360" y1="75" x2="400" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="105" x2="400" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="75" x2="400" y2="105" stroke="#000000" stroke-width="1" /><line x1="360" y1="75" x2="360" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="400" y1="75" x2="440" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="75" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="75" x2="400" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="440" y1="75" x2="480" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="105" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="75" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="75" x2="440" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="480" y1="75" x2="520" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="105" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="75" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="75" x2="480" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="500" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="520" y1="75" x2="560" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="105" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="75" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="75" x2="520" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="560" y1="75" x2="600" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="75" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="75" x2="560" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="600" y1="75" x2="640" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="640" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="75" x2="640" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="75" x2="600" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="640" y1="75" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line x1="680" y1="75" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="75" x2="640" y2="105" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="91" text-anchor="middle" dominant-baseline="middle" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="120" text-anchor="end" >30</text><line x1="40" y1="105" x2="80" y2="105" stroke="#000000" stroke-width="1" /><line x1="40" y1="135" x2="80" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="105" x2="80" y2="135" stroke="#000000" stroke-width="1" /><line x1="40" y1="105" x2="40" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="80" y1="105" x2="120" y2="105" stroke="#000000" stroke-width="1" /><line x1="80" y1="135" x2="120" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="120" y1="105" x2="120" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="80" y1="105" x2="80" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="120" y1="105" x2="160" y2="105" stroke="#000000" stroke-width="1" /><line x1="120" y1="135" x2="160" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="105" x2="160" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="120" y1="105" x2="120" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="140" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="160" y1="105" x2="200" y2="105" stroke="#000000" stroke-width="1" /><line x1="160" y1="135" x2="200" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="105" x2="200" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="160" y1="105" x2="160" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="180" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="200" y1="105" x2="240" y2="105" stroke="#000000" stroke-width="1" /><line x1="200" y1="135" x2="240" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="105" x2="240" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="200" y1="105" x2="200" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="220" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="240" y1="105" x2="280" y2="105" stroke="#000000" stroke-width="1" /><line x1="240" y1="135" x2="280" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="280" y1="105" x2="280" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="240" y1="105" x2="240" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="260" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="280" y1="105" x2="320" y2="105" stroke="#000000" stroke-width="1" /><line x1="280" y1="135" x2="320" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="105" x2="320" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="280" y1="105" x2="280" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="300" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line x1="320" y1="105" x2="360" y2="105" stroke="#000000" stroke-width="1" /><line x1="320" y1="135" x2="360" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="105" x2="360" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="105" x2="320" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="340" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="360" y1="105" x2="400" y2="105" stroke="#000000" stroke-width="1" /><line x1="360" y1="135" x2="400" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="400" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="360" y1="105" x2="360" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="380" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="400" y1="105" x2="440" y2="105" stroke="#000000" stroke-width="1" /><line x1="400" y1="135" x2="440" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="105" x2="440" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="105" x2="400" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="420" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="440" y1="105" x2="480" y2="105" stroke="#000000" stroke-width="1" /><line x1="440" y1="135" x2="480" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="105" x2="480" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="440" y1="105" x2="440" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="460" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="480" y1="105" x2="520" y2="105" stroke="#000000" stroke-width="1" /><line x1="480" y1="135" x2="520" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="105" x2="520" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="480" y1="105" x2="480" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="500" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="520" y1="105" x2="560" y2="105" stroke="#000000" stroke-width="1" /><line x1="520" y1="135" x2="560" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="560" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="520" y1="105" x2="520" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="540" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="560" y1="105" x2="600" y2="105" stroke="#000000" stroke-width="1" /><line x1="560" y1="135" x2="600" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="600" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="560" y1="105" x2="560" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="580" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="600" y1="105" x2="640" y2="105" stroke="#000000" stroke-width="1" /><line x1="600" y1="135" x2="640" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="640" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="600" y1="105" x2="600" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="620" y="121" text-anchor="middle" dominant-baseline="middle" >00</text><line stroke-dasharray="1,3" x1="640" y1="105" x2="680" y2="105" stroke="#000000" stroke-width="1" /><line x1="640" y1="135" x2="680" y2="135" stroke="#000000" stroke-width="1" /><line x1="680" y1="105" x2="680" y2="135" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="640" y1="105" x2="640" y2="135" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="660" y="121" text-anchor="middle" dominant-baseline="middle" >00</text></svg></div>
+<div class="title">Control Output</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
