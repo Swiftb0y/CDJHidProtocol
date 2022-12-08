@@ -309,7 +309,7 @@ https://github.com/Swiftb0y/CDJHidProtocol/[this projects github repository]
 |               |     NativeInstruments    |          Serato          |         PioneerDJ        | Atomix | Algoriddim | Mixvibes | Numark | Dolby
 
 | *CDJ2000NXS2* | `0x02F2F4510ED30A2C1042` | `0XC0BD940FB700BB8FC75B` | `0x02F2F4510ED30A2C1042` | -- | -- | -- | -- | --
-| *DJM900NXS2*  | `0x43F4CDEE2C07C9590742` | `0xD557CE8F5EF07BC27E98` | `0xc03251ee5df69245025b` | -- | -- | -- | -- | --
+| *DJM900NXS2*  | `0x43F4CDEE2C07C9590742` | `0xD557CE8F5EF07BC27E98` | `0xC03251EE5DF69245025B` | -- | -- | -- | -- | --
 | *CDJTOUR1*    | `0x768DCEDA0DD7F010434E` | --                       | --                       | -- | -- | -- | -- | -- 
 | *DJMTOUR1*    | `0x502876738F3DC7CF1DA7` | --                       | --                       | -- | -- | -- | -- | -- 
 | *XDJ1000MK2*  | `0xABA778D3B506E22EBBAE` | --                       | --                       | -- | -- | -- | -- | -- 
