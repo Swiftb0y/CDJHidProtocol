@@ -10,7 +10,7 @@ content:
 asciidoc:
   extensions:
   - "@deepsymmetry/asciidoctor-bytefield"
-  - "asciidoctor-mathjax"
+  - "@djencks/asciidoctor-mathjax"
 
 ui:
   bundle:
