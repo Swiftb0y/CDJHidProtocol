@@ -52,6 +52,28 @@ include::example$common_fragmented_header.edn[]
 takes up while `I` indicates the index of the packet fragment in the current stream.
 Both _ushorts_ encoded in little-endian byte order.
 
+=== Sysex Extended Header
+
+For packets exchanged via Sysex (such as the DJM-750MK2 and DJM-250MK2), the header has a slightly 
+different format again:
+
+[bytefield]
+----
+include::example$common_fragmented_sysex_header.edn[]
+
+(draw-packet-header)
+(draw-box nil [{:span 8} :box-above])
+(draw-box nil [:box-above-related {:span 16}])
+(draw-box (text "inner packet data") [:box-above-related {:span 16}])
+(draw-box nil [:box-above-related {:span 15}])
+(draw-box 0x7f [:bg-green])
+----
+
+The green `0xf0` is just the sysex start. After which follows an extended
+manufacturer ID (likely the one belonging to Pioneer/AlphaTheta). The five bytes
+after that (blue) have not yet been understood, but don't seem to change. After which
+the inner data follows which is terminated by trailing Sysex EOX (`0x7F`).
+Thank you https://blog.frantovo.cz/[František Kučera a.k.a. xkucf03] for https://blog.frantovo.cz/c/387/Pioneer%20DJ%20DJM-250MK2%20support%20in%20the%20Linux%20kernel[their work] on the DJM-250MK2.
 
 === TLV Structure
 
@@ -64,7 +86,7 @@ include::example$tlv_struct.edn[]
 
 ----
 
-These TLV structures can occur nested (for example in the handshakes TODO hyperlink)
+These TLV structures can occur nested (for example in the xref:handshake.adoc[handshake])
 It seems `T` only indirectly describes the actual type of data in the buffer. Instead `T`
 indicates __what the data is actually used for__, which in turn describes the actual
 type of the data.

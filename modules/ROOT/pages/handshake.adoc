@@ -22,13 +22,17 @@ own. The host instead has to constantly pull for changes. So make sure the
 Software running on the host is doing that before connecting initiating the
 connection on the CDJ.
 
+NOTE: This also mostly applies to other Pioneer devices than the CDJ, notably
+pioneer devices that only have MIDI+Sysex controls instead of HID, but are still
+locked without performing this handshake first (via Sysex). 
+
 == Serialization Specifics
 
 NOTE: in the following documentation, buffers and integer values are used
 interchangeably. All integers larger than one byte are always (de-)serialized
 in big-endian order.
 
-The handshake packets always have the following structure:
+The handshake packets exchanged over HID always have the following structure:
 
 [bytefield]
 ----
@@ -53,6 +57,9 @@ a list of arguments. The "T" of the super-tlv indicates the current stage in the
 handshake procedure. The "L" of the super-tlv indicates the length of the entire
 payload including the TLV header (so for a payload with 9 Bytes length, the length
 of the TLV will be 9+2=11).
+
+NOTE: if messages are exchanged over sysex messages, the packet header is instead
+of the xref:startup.adoc#_sysex_extended_header[Sysex Extended Header] form.
 
 .super-tlv stages
 [options="header"]
@@ -84,12 +91,14 @@ will reflect the ordering in which they were observed in the wild.
 | `0x05`   | Vendor-specific device ID | Buffer spread out
 |===
 
-CAUTION: For unknown reasons, the buffers in the arguments `0x03`, `0x04` and
-`0x05` are spread out. Meaning each byte is split in half and serialized into 
-two bytes. So the buffer `[0x12,0x34]` will actually be transmitted as
-`[0x01, 0x02, 0x03, 0x04]`. When describing how the arguments will be formed,
-the compact version will always be assumed while the bytefield figures will
-contain the sizes of the spread out buffer as they are transmitted.
+CAUTION: For compatibility reasons with sysex, the buffers in the arguments
+`0x03`, `0x04` and `0x05` are spread out. Meaning each byte is split in half and
+serialized into two bytes. So the buffer `[0x12,0x34]` will actually be
+transmitted as `[0x01, 0x02, 0x03, 0x04]`. This is because you can only send
+7-bit bytes via sysex, which is fine for transmitting Ascii-text, but not for
+binary data containing 8-bit data. When describing how the arguments will be
+formed, the compact version will always be assumed while the bytefield figures
+will contain the sizes of the spread out buffer as they are transmitted.
 
 == Handshake procedure
 
