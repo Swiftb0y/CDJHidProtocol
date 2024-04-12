@@ -1,6 +1,6 @@
 site:
   title: Pioneer CDJ HID Analysis
-  url: https://mixb.me/CDJHidProtocol/
+  url: https://swiftb0y.github.io/CDJHidProtocol/
   start_page: hid-analysis::startup.adoc
 content:
   sources:
