@@ -13,4 +13,4 @@
   (draw-column-headers)
   (draw-box 0xf0 [:bold :bg-green])
   (draw-box 0x004005 [{:span 2} :bg-green])
-  (draw-box "device dependent value" [{:span 5} :bg-blue]))
+  (draw-box "spread USB-PID" [{:span 4} :bg-blue]))
