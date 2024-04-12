@@ -78,6 +78,10 @@ https://blog.frantovo.cz/[František Kučera a.k.a. xkucf03] for
 https://blog.frantovo.cz/c/387/Pioneer%20DJ%20DJM-250MK2%20support%20in%20the%20Linux%20kernel[their
 work on the DJM-250MK2] which helped me spot these differences in the sysex version.
 
+NOTE: since the PID is 16-bits long (8-bit bytes), but sysex only transmits 
+7-bit bytes, the 4 4-bit nibbles of the PID are then spaced out over the four
+7-bit bytes in the sysex (each nibble occupying the 4 least significant bits).
+
 === TLV Structure
 
 Some parts of the Protocol utilize a TLV structure:
