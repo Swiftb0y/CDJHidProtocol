@@ -4,17 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>HID Handshake :: Pioneer CDJ HID Analysis</title>
-    <link rel="canonical" href="https://mixb.me/CDJHidProtocol/hid-analysis/handshake.html">
-    <meta name="generator" content="Antora 2.3.4">
+    <link rel="canonical" href="https://swiftb0y.github.io/CDJHidProtocol/hid-analysis/handshake.html">
+    <meta name="generator" content="Antora 3.1.7">
     <link rel="stylesheet" href="../_/css/site.css">
-    <script>var uiRootPath = '../_'</script>
   </head>
   <body class="article">
 <header class="header">
   <nav class="navbar">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://mixb.me/CDJHidProtocol">Pioneer CDJ HID Analysis</a>
-      <button class="navbar-burger" data-target="topbar-nav">
+      <a class="navbar-item" href="https://swiftb0y.github.io/CDJHidProtocol">Pioneer CDJ HID Analysis</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
         <span></span>
         <span></span>
         <span></span>
@@ -39,14 +38,6 @@
             <a class="navbar-item" href="#">Service C</a>
           </div>
         </div>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#">Resources</a>
-          <div class="navbar-dropdown">
-            <a class="navbar-item" href="#">Resource A</a>
-            <a class="navbar-item" href="#">Resource B</a>
-            <a class="navbar-item" href="#">Resource C</a>
-          </div>
-        </div>
         <div class="navbar-item">
           <span class="control">
             <a class="button is-primary" href="#">Download</a>
@@ -62,6 +53,7 @@
     <div class="panels">
 <div class="nav-panel-menu is-active" data-panel="menu">
   <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
     <h3 class="title"><a href="startup.html">CDJ HID Packet Analysis</a></h3>
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
@@ -93,7 +85,7 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <a class="title" href="startup.html">CDJ HID Packet Analysis</a>
+      <div class="title"><a href="startup.html">CDJ HID Packet Analysis</a></div>
       <ul class="versions">
         <li class="version is-current is-latest">
           <a href="startup.html">master</a>
@@ -115,8 +107,8 @@
     <li><a href="handshake.html">CDJ Handshake</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/Swiftb0y/CDJHidProtocol/edit/master/modules/ROOT/pages/handshake.adoc">Edit this Page</a></div>
-  </div>
+<div class="edit-this-page"><a href="https://github.com/Swiftb0y/CDJHidProtocol/edit/main/modules/ROOT/pages/handshake.adoc">Edit this Page</a></div>
+</div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
@@ -171,6 +163,20 @@ connection on the CDJ.
 </tr>
 </table>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This also mostly applies to other Pioneer devices than the CDJ, notably
+pioneer devices that only have MIDI+Sysex controls instead of HID, but are still
+locked without performing this handshake first (via Sysex).
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -191,7 +197,7 @@ in big-endian order.
 </table>
 </div>
 <div class="paragraph">
-<p>The handshake packets always have the following structure:</p>
+<p>The handshake packets exchanged over HID always have the following structure:</p>
 </div>
 <div class="imageblock bytefield">
 <div class="content"><?xml version="1.0" encoding="UTF-8"?><svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="681" height="146" viewBox="0 0 681 146" ><text x="60" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >0</text><text x="100" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >1</text><text x="140" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >2</text><text x="180" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >3</text><text x="220" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >4</text><text x="260" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >5</text><text x="300" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >6</text><text x="340" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >7</text><text x="380" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >8</text><text x="420" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >9</text><text x="460" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >a</text><text x="500" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >b</text><text x="540" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >c</text><text x="580" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >d</text><text x="620" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >e</text><text x="660" y="8" font-family="Courier New, monospace" font-size="11" dominant-baseline="middle" text-anchor="middle" >f</text><line x1="40" y1="15" x2="80" y2="15" stroke="#000000" stroke-width="1" /><line x1="40" y1="45" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><line x1="40" y1="15" x2="40" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="60" y="31" text-anchor="middle" dominant-baseline="middle" >00</text><rect x="80" y="15" height="30" width="40" fill="#a0ffa0" /><line x1="80" y1="15" x2="120" y2="15" stroke="#000000" stroke-width="1" /><line x1="80" y1="45" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><line x1="80" y1="15" x2="80" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Courier New, monospace" x="100" y="31" text-anchor="middle" dominant-baseline="middle" >f0</text><rect x="120" y="15" height="30" width="80" fill="#80a0ff" /><line x1="120" y1="15" x2="200" y2="15" stroke="#000000" stroke-width="1" /><line x1="120" y1="45" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><line x1="120" y1="15" x2="120" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="160" y="31" text-anchor="middle" dominant-baseline="middle" >I</text><rect x="200" y="15" height="30" width="80" fill="#80a0ff" /><line x1="200" y1="15" x2="280" y2="15" stroke="#000000" stroke-width="1" /><line x1="200" y1="45" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><line x1="200" y1="15" x2="200" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="240" y="31" text-anchor="middle" dominant-baseline="middle" >L</text><rect x="280" y="15" height="30" width="40" fill="#ffa080" /><line x1="280" y1="15" x2="320" y2="15" stroke="#000000" stroke-width="1" /><line x1="280" y1="45" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><line x1="280" y1="15" x2="280" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="300" y="31" text-anchor="middle" dominant-baseline="middle" >T<tspan font-size="70%" dy="0.5ex" dominant-baseline="middle" >S</tspan></text><line x1="320" y1="15" x2="360" y2="15" stroke="#000000" stroke-width="1" /><line x1="320" y1="45" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="320" y1="15" x2="320" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="340" y="31" text-anchor="middle" dominant-baseline="middle" >L<tspan font-size="70%" dy="0.5ex" dominant-baseline="middle" >S</tspan></text><rect x="360" y="15" height="30" width="40" fill="#ffa080" /><line x1="360" y1="15" x2="400" y2="15" stroke="#000000" stroke-width="1" /><line x1="360" y1="45" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><line x1="360" y1="15" x2="360" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="380" y="31" text-anchor="middle" dominant-baseline="middle" >N</text><line x1="400" y1="15" x2="440" y2="15" stroke="#000000" stroke-width="1" /><line x1="400" y1="45" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,3" x1="400" y1="15" x2="400" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="420" y="31" text-anchor="middle" dominant-baseline="middle" >L<tspan font-size="70%" dy="0.5ex" dominant-baseline="middle" >N</tspan></text><line x1="440" y1="15" x2="600" y2="15" stroke="#000000" stroke-width="1" /><line x1="440" y1="45" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="15" x2="600" y2="45" stroke="#000000" stroke-width="1" /><line x1="440" y1="15" x2="440" y2="45" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="520" y="31" text-anchor="middle" dominant-baseline="middle" >ArgN Payload</text><line x1="600" y1="15" x2="680" y2="15" stroke="#000000" stroke-width="1" /><line x1="680" y1="15" x2="680" y2="45" stroke="#000000" stroke-width="1" /><line x1="600" y1="15" x2="600" y2="45" stroke="#000000" stroke-width="1" /><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="30" text-anchor="end" >00</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="60" text-anchor="end" >10</text><line x1="680" y1="45" x2="680" y2="75" stroke="#000000" stroke-width="1" /><line x1="40" y1="45" x2="40" y2="75" stroke="#000000" stroke-width="1" /><text font-size="18" font-family="Palatino, Georgia, Times New Roman, serif" x="360" y="61" text-anchor="middle" dominant-baseline="middle" >More Arguments</text><text font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" x="35" y="90" text-anchor="end" >20</text><line x1="40" y1="75" x2="40" y2="90" stroke="#000000" stroke-width="1" /><line x1="680" y1="75" x2="680" y2="90" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,1" x1="40" y1="90" x2="680" y2="120" stroke="#000000" stroke-width="1" /><line x1="680" y1="75" x2="680" y2="120" stroke="#000000" stroke-width="1" /><line stroke-dasharray="1,1" x1="40" y1="100" x2="680" y2="130" stroke="#000000" stroke-width="1" /><line x1="40" y1="100" x2="40" y2="130" stroke="#000000" stroke-width="1" /><line x1="40" y1="130" x2="40" y2="145" stroke="#000000" stroke-width="1" /><line x1="680" y1="130" x2="680" y2="145" stroke="#000000" stroke-width="1" /><text font-size="11" font-family="Palatino, Georgia, Times New Roman, serif" font-style="italic" dominant-baseline="middle" x="35" y="160" text-anchor="end" >i+<tspan font-size="11" font-family="Courier New, monospace" font-style="normal" dominant-baseline="middle" >00</tspan></text><line x1="40" y1="145" x2="680" y2="145" stroke="#000000" stroke-width="1" /></svg></div>
@@ -204,6 +210,19 @@ a list of arguments. The "T" of the super-tlv indicates the current stage in the
 handshake procedure. The "L" of the super-tlv indicates the length of the entire
 payload including the TLV header (so for a payload with 9 Bytes length, the length
 of the TLV will be 9+2=11).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+if messages are exchanged over sysex messages, the packet header is instead
+of the <a href="startup.html#_sysex_extended_header" class="xref page">Sysex Extended Header</a> form.
+</td>
+</tr>
+</table>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. super-tlv stages</caption>
@@ -303,12 +322,14 @@ will reflect the ordering in which they were observed in the wild.</p>
 <i class="fa icon-caution" title="Caution"></i>
 </td>
 <td class="content">
-For unknown reasons, the buffers in the arguments <code>0x03</code>, <code>0x04</code> and
-<code>0x05</code> are spread out. Meaning each byte is split in half and serialized into
-two bytes. So the buffer <code>[0x12,0x34]</code> will actually be transmitted as
-<code>[0x01, 0x02, 0x03, 0x04]</code>. When describing how the arguments will be formed,
-the compact version will always be assumed while the bytefield figures will
-contain the sizes of the spread out buffer as they are transmitted.
+For compatibility reasons with sysex, the buffers in the arguments
+<code>0x03</code>, <code>0x04</code> and <code>0x05</code> are spread out. Meaning each byte is split in half and
+serialized into two bytes. So the buffer <code>[0x12,0x34]</code> will actually be
+transmitted as <code>[0x01, 0x02, 0x03, 0x04]</code>. This is because you can only send
+7-bit bytes via sysex, which is fine for transmitting Ascii-text, but not for
+binary data containing 8-bit data. When describing how the arguments will be
+formed, the compact version will always be assumed while the bytefield figures
+will contain the sizes of the spread out buffer as they are transmitted.
 </td>
 </tr>
 </table>
@@ -534,7 +555,7 @@ free to contact me by opening an issue on
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>DJM900NXS2</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>0x43F4CDEE2C07C9590742</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xD557CE8F5EF07BC27E98</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0xC03251EE5DF69245025B</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
@@ -671,7 +692,7 @@ empty packets:</p>
   <p>This page was built using the Antora default UI.</p>
   <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
 </footer>
-<script src="../_/js/site.js"></script>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
 <script async src="../_/js/vendor/highlight.js"></script>
   </body>
 </html>
