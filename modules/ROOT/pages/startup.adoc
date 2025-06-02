@@ -114,3 +114,4 @@ for using my research in his effort to bring Linux Support to the DJM-250MK2
 and correcting me in https://blog.frantovo.cz/c/387/Pioneer%20DJ%20DJM-250MK2%20support%20in%20the%20Linux%20kernel[his blogpost].
 I'd also like to thank Ashley Skye for [contributing the Rekordbox vendor 
 Device ID for the DJM-900NXS2](https://github.com/Swiftb0y/CDJHidProtocol/pull/7)
+Also thanks to "finn" for providing me their DJM-450 Rekordbox Device ID via PM.
