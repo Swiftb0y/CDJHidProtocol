@@ -115,3 +115,6 @@ and correcting me in https://blog.frantovo.cz/c/387/Pioneer%20DJ%20DJM-250MK2%20
 I'd also like to thank Ashley Skye for [contributing the Rekordbox vendor 
 Device ID for the DJM-900NXS2](https://github.com/Swiftb0y/CDJHidProtocol/pull/7)
 Also thanks to "finn" for providing me their DJM-450 Rekordbox Device ID via PM.
+Thank you to [@musicmindmachine](https://github.com/musicmindmachine) for [finding
+an issue in the handshake procedure](https://github.com/Swiftb0y/CDJHidProtocol/issues/9)
+and correcting me.

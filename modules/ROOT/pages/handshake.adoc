@@ -167,8 +167,8 @@ include::example$common_fragmented_header.edn[]
   #(draw-box "Product" {:span 4}))
 (tlv-struct 4 0x0a
   #(draw-box "HashA" {:span 8}))
-(tlv-struct 3 0xd
-  #(draw-box "SeedE" {:span 0xb}))
+(tlv-struct 3 0x0a
+  #(draw-box "SeedE" {:span 8}))
 
 (draw-padding 0x40)
 ----
