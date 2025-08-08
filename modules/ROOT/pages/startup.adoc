@@ -109,12 +109,14 @@ Protocol as well as helping me in the setup of this wiki, using bytefield-svg
 and supplying me with some USB-Captures of the XDJ-XZ.
 Also thanks to mailto:ard@kwaak.net/[Ard van Breemen] for helping out with his 
 in-depth knowledge of the USB protocol.
-In addition I also want to thank https://blog.frantovo.cz/[František Kučera]
-for using my research in his effort to bring Linux Support to the DJM-250MK2
-and correcting me in https://blog.frantovo.cz/c/387/Pioneer%20DJ%20DJM-250MK2%20support%20in%20the%20Linux%20kernel[his blogpost].
-I'd also like to thank Ashley Skye for [contributing the Rekordbox vendor 
-Device ID for the DJM-900NXS2](https://github.com/Swiftb0y/CDJHidProtocol/pull/7)
-Also thanks to "finn" for providing me their DJM-450 Rekordbox Device ID via PM.
-Thank you to [@musicmindmachine](https://github.com/musicmindmachine) for [finding
-an issue in the handshake procedure](https://github.com/Swiftb0y/CDJHidProtocol/issues/9)
-and correcting me.
+In addition I also want to thank https://blog.frantovo.cz/[František Kučera] for
+using my research in his effort to bring Linux Support to the DJM-250MK2 and
+correcting me in
+https://blog.frantovo.cz/c/387/Pioneer%20DJ%20DJM-250MK2%20support%20in%20the%20Linux%20kernel[his
+blogpost]. I'd also like to thank Ashley Skye for
+https://github.com/Swiftb0y/CDJHidProtocol/pull/7[contributing the Rekordbox
+vendor Device ID for the DJM-900NXS2] Also thanks to "finn" for providing me
+their DJM-450 Rekordbox Device ID via PM. Thank you to
+https://github.com/musicmindmachine[@musicmindmachine] for
+https://github.com/Swiftb0y/CDJHidProtocol/issues/9[finding an issue in the
+handshake procedure] and correcting me.
