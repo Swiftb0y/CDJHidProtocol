@@ -319,9 +319,9 @@ https://github.com/Swiftb0y/CDJHidProtocol/[this projects github repository]
 
 | *CDJ2000NXS2* | `0x02F2F4510ED30A2C1042` | `0XC0BD940FB700BB8FC75B` | `0x02F2F4510ED30A2C1042` | -- | -- | -- | -- | --
 | *DJM900NXS2*  | `0x43F4CDEE2C07C9590742` | `0xD557CE8F5EF07BC27E98` | `0xC03251EE5DF69245025B` | -- | -- | -- | -- | --
-| *CDJTOUR1*    | `0x768DCEDA0DD7F010434E` | --                       | --                       | -- | -- | -- | -- | -- 
-| *DJMTOUR1*    | `0x502876738F3DC7CF1DA7` | --                       | --                       | -- | -- | -- | -- | -- 
-| *XDJ1000MK2*  | `0xABA778D3B506E22EBBAE` | --                       | --                       | -- | -- | -- | -- | -- 
+| *CDJTOUR1*    | `0x768DCEDA0DD7F010434E` | --                       | `0x768DCEDA0DD7F010434E`^1^ | -- | -- | -- | -- | -- 
+| *DJMTOUR1*    | `0x502876738F3DC7CF1DA7` | --                       | `0xB28E86FA4962F5A97893`^1^ | -- | -- | -- | -- | -- 
+| *XDJ1000MK2*  | `0xABA778D3B506E22EBBAE` | --                       | `0xABA778D3B506E22EBBAE`^1^ | -- | -- | -- | -- | -- 
 | *DJM450*      | `0x08EF3F2F1E7A9017F6AF` | --                       | `0x99D555432C70537A6F02` | -- | -- | -- | -- | -- 
 | *DJM250MK2*   | `0xD2F58B612C6206819139` | --                       | `0x59B54BFEE44A5AC8E4C5` | -- | -- | -- | -- | -- 
 | *DJM750MK2*   | `0x866E33BD04852E71ED21` | --                       | `0x490a44496383029BF371` | -- | -- | -- | -- | --
@@ -329,12 +329,30 @@ https://github.com/Swiftb0y/CDJHidProtocol/[this projects github repository]
 | *DJMV10*      | `0x3C83DB259C76FE8DB2AB` | `0x1D3EAC55C613D297623D` | `0x70014D05BEF2E4DE60D6` | -- | -- | -- | -- | --
 | *XDJXZ*       | Not supported            | `0x2D99858D0A5A913D4EBD` | 
 Captures lead me to believe that there actually is no handshake taking place in this configuration| -- | -- | -- | -- | --
+| *DDJ-RZ*      | -- | -- | `0x644F87919E74AF27397B`^1^ | -- | -- | -- | -- | --
+| *DDJ-RZX*     | -- | -- | `0xF0A346BDE8D8E18401BC`^1^ | -- | -- | -- | -- | --
+| *XDJ-RX*      | -- | -- | `0xB17A383E50EAE1091BAB`^1^ | -- | -- | -- | -- | --
+| *XDJ-RX2*     | -- | -- | `0x58182BF69B5F279246FF`^1^ | -- | -- | -- | -- | --
+| *XDJ-RR*      | -- | -- | `0x969AF20C918F630C7D41`^1^ | -- | -- | -- | -- | --
+| *DDJ-RB*      | -- | -- | `0x4458F9B509AE9D5BE516`^1^ | -- | -- | -- | -- | --
+| *DDJ-RR*      | -- | -- | `0x0A1DC98D1438279D0F7F`^1^ | -- | -- | -- | -- | --
+| *DDJ-WeGO4*   | -- | -- | `0x6D63D5F86510C71F6F8A`^1^ | -- | -- | -- | -- | --
+| *DDJ-1000*    | -- | -- | `0x87A08EEAC09034760B90`^1^ | -- | -- | -- | -- | --
+| *DDJ-800*     | -- | -- | `0xEA5580A6D0D9E47F2053`^1^ | -- | -- | -- | -- | --
+| *DDJ-400*     | -- | -- | `0x074A26AA2EBE92E3EF95`^1^ | -- | -- | -- | -- | --
+| *DDJ-200*     | -- | -- | `0x27AA50C3BC8996A1CB97`^1^ | -- | -- | -- | -- | --
+| *DDJ-XP1*     | -- | -- | `0xE176C4544F0A15BC0A90`^1^ | -- | -- | -- | -- | --
+| *DDJ-XP2*     | -- | -- | `0x2DB2BFFA0433A5D497B3`^1^ | -- | -- | -- | -- | --
+| *RBDMX1*      | -- | -- | `0x9302D5E679ED0A9EED73`^1^ | -- | -- | -- | -- | --
+| *INTERFACE2*  | -- | -- | `0x0A85D9F952DC6DB0A50A`^1^ | -- | -- | -- | -- | --
 | *CDJ3000X*    | -- | -- | -- | -- | -- | -- | -- | --
 | *CDJ1500X*    | -- | -- | -- | -- | -- | -- | -- | --
 |===
 
 NOTE: From my experiments, it looks like Atomix VirtualDJ actually poses
 as Rekordbox instead of using its own identifiers.
+
+NOTE: 1 - Device ID extrapolated from the Rekordbox binary, not individually validated using real hardware.
 
 NOTE: The CDJ-3000X and CDJ-1500X don't appear to require the handshake.
 
